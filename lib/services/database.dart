@@ -36,6 +36,23 @@ class DatabaseService {
     });
   }
 
+  static Future<void> updateUserProfile({
+    String? displayName,
+    String? email,
+  }) async {
+    final uid = FirebaseAuth.instance.currentUser?.uid;
+    if (uid == null) return;
+    final updates = <String, dynamic>{};
+    if (displayName != null) updates['displayName'] = displayName;
+    if (email != null) updates['email'] = email;
+    if (updates.isNotEmpty) {
+      await _db.collection('tbl_users').doc(uid).update(updates);
+    }
+    if (displayName != null) {
+      await FirebaseAuth.instance.currentUser?.updateDisplayName(displayName);
+    }
+  }
+
   // ── Saved recipes ───────────────────────────────────────────────────────
 
   static Future<String?> getCurrentUserID() async {

@@ -31,6 +31,24 @@ class AuthService {
     }
   }
 
+  static Future<String?> resetPassword(String email) async {
+    try {
+      await _auth.sendPasswordResetEmail(email: email.trim());
+      return null;
+    } on FirebaseAuthException catch (e) {
+      switch (e.code) {
+        case 'user-not-found':
+          return 'No account found for that email.';
+        case 'invalid-email':
+          return 'Enter a valid email address.';
+        default:
+          return e.message ?? 'Something went wrong. Please try again.';
+      }
+    } catch (_) {
+      return 'An unexpected error occurred.';
+    }
+  }
+
   static String _mapError(String code) {
     switch (code) {
       case 'email-already-in-use':

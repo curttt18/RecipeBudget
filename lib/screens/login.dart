@@ -1,6 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+import '../services/auth_service.dart';
 import 'register.dart';
 import 'loading_screen.dart';
 
@@ -39,6 +40,146 @@ class _LoginPageState extends State<LoginPage>
     _emailController.dispose();
     _passwordController.dispose();
     super.dispose();
+  }
+
+  void _showForgotPasswordSheet() {
+    final emailCtrl = TextEditingController(text: _emailController.text.trim());
+    String? errorMsg;
+    bool sending = false;
+
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (ctx) => StatefulBuilder(
+        builder: (ctx, setModalState) => Padding(
+          padding: EdgeInsets.only(bottom: MediaQuery.of(ctx).viewInsets.bottom),
+          child: Container(
+            padding: const EdgeInsets.fromLTRB(24, 12, 24, 32),
+            decoration: const BoxDecoration(
+              color: Color(0xFF1E1E1E),
+              borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+            ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Container(
+                  width: 40,
+                  height: 4,
+                  margin: const EdgeInsets.only(bottom: 20),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFF3A3A3A),
+                    borderRadius: BorderRadius.circular(2),
+                  ),
+                ),
+                const Align(
+                  alignment: Alignment.centerLeft,
+                  child: Text(
+                    'Reset Password',
+                    style: TextStyle(
+                      color: _white,
+                      fontSize: 18,
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 6),
+                const Align(
+                  alignment: Alignment.centerLeft,
+                  child: Text(
+                    "Enter your email and we'll send a reset link.",
+                    style: TextStyle(color: _grey, fontSize: 13),
+                  ),
+                ),
+                const SizedBox(height: 24),
+                TextField(
+                  controller: emailCtrl,
+                  keyboardType: TextInputType.emailAddress,
+                  style: const TextStyle(color: _white, fontSize: 14),
+                  decoration: InputDecoration(
+                    labelText: 'Email Address',
+                    labelStyle: const TextStyle(color: _grey, fontSize: 13),
+                    prefixIcon: const Icon(Icons.email_outlined, color: _walnut, size: 20),
+                    filled: true,
+                    fillColor: _charcoal,
+                    errorText: errorMsg,
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                      borderSide: const BorderSide(color: Color(0xFF3A3A3A)),
+                    ),
+                    enabledBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                      borderSide: const BorderSide(color: Color(0xFF3A3A3A)),
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                      borderSide: const BorderSide(color: _walnut, width: 1.5),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 24),
+                SizedBox(
+                  width: double.infinity,
+                  height: 50,
+                  child: ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: _walnut,
+                      disabledBackgroundColor: _walnut.withValues(alpha: 0.6),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(14),
+                      ),
+                    ),
+                    onPressed: sending
+                        ? null
+                        : () async {
+                            setModalState(() {
+                              sending = true;
+                              errorMsg = null;
+                            });
+                            final error = await AuthService.resetPassword(emailCtrl.text);
+                            if (ctx.mounted) {
+                              if (error == null) {
+                                Navigator.pop(ctx);
+                                if (mounted) {
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    const SnackBar(
+                                      content: Text('Reset link sent — check your inbox.'),
+                                    ),
+                                  );
+                                }
+                              } else {
+                                setModalState(() {
+                                  errorMsg = error;
+                                  sending = false;
+                                });
+                              }
+                            }
+                          },
+                    child: sending
+                        ? const SizedBox(
+                            width: 20,
+                            height: 20,
+                            child: CircularProgressIndicator(
+                              color: _white,
+                              strokeWidth: 2,
+                            ),
+                          )
+                        : const Text(
+                            'Send Reset Link',
+                            style: TextStyle(
+                              color: _white,
+                              fontSize: 15,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
   }
 
   Future<void> _signInWithGoogle() async {
@@ -145,7 +286,7 @@ class _LoginPageState extends State<LoginPage>
               Align(
                 alignment: Alignment.centerRight,
                 child: GestureDetector(
-                  onTap: () {},
+                  onTap: _showForgotPasswordSheet,
                   child: const Text(
                     'Forgot password?',
                     style: TextStyle(color: _walnut, fontSize: 12),

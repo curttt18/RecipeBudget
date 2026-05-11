@@ -11,109 +11,116 @@ class RecipeCard extends StatelessWidget {
     required this.recipe,
     this.isSaved = false,
     this.onToggleSave,
+    this.onTap,
   });
 
   final RecipeModel recipe;
   final bool isSaved;
   final VoidCallback? onToggleSave;
+  final VoidCallback? onTap;
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      decoration: BoxDecoration(
-        color: const Color(0xFF242424),
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: const Color(0xFF333333), width: 1),
-      ),
-      clipBehavior: Clip.antiAlias,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Expanded(
-            flex: 55,
-            child: Stack(
-              children: [
-                Positioned.fill(
-                  child: _ImagePlaceholder(
-                    category: recipe.category,
-                    imageUrl: recipe.imageUrl,
-                  ),
-                ),
-                Positioned(
-                  bottom: 8,
-                  right: 8,
-                  child: GestureDetector(
-                    onTap: onToggleSave,
-                    child: Container(
-                      width: 30,
-                      height: 30,
-                      decoration: BoxDecoration(
-                        color: const Color.fromRGBO(0, 0, 0, 0.55),
-                        shape: BoxShape.circle,
-                      ),
-                      child: Icon(
-                        isSaved ? Icons.favorite_rounded : Icons.favorite_border_rounded,
-                        color: isSaved ? Color(0xFFE57373) : _white,
-                        size: 16,
-                      ),
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
-          Expanded(
-            flex: 45,
-            child: Padding(
-              padding: const EdgeInsets.fromLTRB(10, 10, 10, 10),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        decoration: BoxDecoration(
+          color: const Color(0xFF242424),
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(color: const Color(0xFF333333), width: 1),
+        ),
+        clipBehavior: Clip.antiAlias,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Expanded(
+              flex: 55,
+              child: Stack(
                 children: [
-                  Text(
-                    recipe.title,
-                    maxLines: 2,
-                    overflow: TextOverflow.ellipsis,
-                    style: const TextStyle(
-                      color: _white,
-                      fontSize: 12.5,
-                      fontWeight: FontWeight.w600,
-                      height: 1.3,
+                  Positioned.fill(
+                    child: _ImagePlaceholder(
+                      category: recipe.category,
+                      imageUrl: recipe.imageUrl,
                     ),
                   ),
-                  const Spacer(),
-                  Row(
-                    children: [
-                      const Icon(Icons.attach_money_rounded,
-                          color: _walnut, size: 14),
-                      Text(
-                        recipe.costEstimate.toStringAsFixed(2),
-                        style: const TextStyle(
-                          color: _walnut,
-                          fontSize: 13,
-                          fontWeight: FontWeight.w700,
+                  Positioned(
+                    bottom: 8,
+                    right: 8,
+                    child: GestureDetector(
+                      onTap: onToggleSave,
+                      child: Container(
+                        width: 30,
+                        height: 30,
+                        decoration: const BoxDecoration(
+                          color: Color.fromRGBO(0, 0, 0, 0.55),
+                          shape: BoxShape.circle,
+                        ),
+                        child: Icon(
+                          isSaved
+                              ? Icons.favorite_rounded
+                              : Icons.favorite_border_rounded,
+                          color: isSaved
+                              ? Color(0xFFE57373)
+                              : _white,
+                          size: 16,
                         ),
                       ),
-                      const Spacer(),
-                      if (recipe.prepMinutes != null)
-                        Row(
-                          children: [
-                            const Icon(Icons.timer_outlined,
-                                color: _grey, size: 12),
-                            const SizedBox(width: 2),
-                            Text(
-                              '${recipe.prepMinutes}m',
-                              style: const TextStyle(
-                                  color: _grey, fontSize: 11),
-                            ),
-                          ],
-                        ),
-                    ],
+                    ),
                   ),
                 ],
               ),
             ),
-          ),
-        ],
+            Expanded(
+              flex: 45,
+              child: Padding(
+                padding: const EdgeInsets.fromLTRB(10, 10, 10, 10),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      recipe.title,
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                      style: const TextStyle(
+                        color: _white,
+                        fontSize: 12.5,
+                        fontWeight: FontWeight.w600,
+                        height: 1.3,
+                      ),
+                    ),
+                    const Spacer(),
+                    Row(
+                      children: [
+                        Text(
+                          '₱${recipe.costEstimate.toStringAsFixed(2)}',
+                          style: const TextStyle(
+                            color: _walnut,
+                            fontSize: 13,
+                            fontWeight: FontWeight.w700,
+                          ),
+                        ),
+                        const Spacer(),
+                        if (recipe.prepMinutes != null)
+                          Row(
+                            children: [
+                              const Icon(Icons.timer_outlined,
+                                  color: _grey, size: 12),
+                              const SizedBox(width: 2),
+                              Text(
+                                '${recipe.prepMinutes}m',
+                                style: const TextStyle(
+                                    color: _grey, fontSize: 11),
+                              ),
+                            ],
+                          ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -158,9 +165,17 @@ class _ImagePlaceholder extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     if (imageUrl != null) {
-      return Image.network(imageUrl!, fit: BoxFit.cover, width: double.infinity);
+      return Image.network(
+        imageUrl!,
+        fit: BoxFit.cover,
+        width: double.infinity,
+        errorBuilder: (ctx, err, stack) => _placeholder(),
+      );
     }
+    return _placeholder();
+  }
 
+  Widget _placeholder() {
     return Container(
       width: double.infinity,
       color: _bgColor,
@@ -177,7 +192,8 @@ class _ImagePlaceholder extends StatelessWidget {
             top: 8,
             right: 8,
             child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 3),
+              padding:
+                  const EdgeInsets.symmetric(horizontal: 7, vertical: 3),
               decoration: BoxDecoration(
                 color: const Color.fromRGBO(0, 0, 0, 0.45),
                 borderRadius: BorderRadius.circular(20),

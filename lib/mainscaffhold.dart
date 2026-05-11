@@ -4,6 +4,7 @@ import 'model/recipe_model.dart';
 import 'screens/home.dart';
 import 'screens/login.dart';
 import 'screens/profile.dart';
+import 'screens/recipedetails.dart';
 import 'screens/recipelist.dart';
 import 'screens/register.dart';
 import 'screens/settings.dart';
@@ -283,7 +284,7 @@ class _SavrDrawer extends StatelessWidget {
                 ),
                 SizedBox(height: 3),
                 Text(
-                  'Budget: \$20.00 / meal',
+                  'Budget: ₱20.00 / meal',
                   style: TextStyle(
                     color: Color(0xFFB09070),
                     fontSize: 11.5,
@@ -776,6 +777,16 @@ class _RecipeBrowserPageState extends State<_RecipeBrowserPage> {
                   recipes: filtered,
                   savedIds: _savedIds,
                   onToggleSave: _toggleSave,
+                  onTap: (recipe) => Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (_) => RecipeDetailsPage(
+                        recipe: recipe,
+                        isSaved: _savedIds.contains(recipe.recipeId),
+                        userId: _currentUserID,
+                      ),
+                    ),
+                  ),
                 ),
             ],
           ),

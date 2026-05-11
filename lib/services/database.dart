@@ -45,6 +45,13 @@ class DatabaseService {
     return doc.data()?['userID']?.toString();
   }
 
+  static Future<Map<String, dynamic>?> getCurrentUserData() async {
+    final uid = FirebaseAuth.instance.currentUser?.uid;
+    if (uid == null) return null;
+    final doc = await _db.collection('tbl_users').doc(uid).get();
+    return doc.data();
+  }
+
   static Future<int> _nextSavedRecipeID() async {
     final snap = await _db.collection('tbl_savedrecipes').get();
     return snap.docs.length + 1;

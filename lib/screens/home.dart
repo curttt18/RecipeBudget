@@ -1,7 +1,9 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import '../model/recipe_model.dart';
-import '../model/user_model.dart';
+import '../services/database.dart';
 import 'budget_slider.dart';
+import 'recipedetails.dart';
 import 'recipelist.dart';
 
 const _charcoal = Color(0xFF2C2C2C);
@@ -18,26 +20,6 @@ const _categories = [
   'Under 20 Mins',
 ];
 
-const _mockUser = UserModel(
-  userId: 'u1',
-  name: 'Jacob',
-  email: '',
-  globalBudget: 20.0,
-);
-
-const List<RecipeModel> _mockRecipes = [
-  RecipeModel(recipeId: '1', title: 'Garlic Butter Pasta', costEstimate: 4.50, category: 'Dinner', prepMinutes: 25),
-  RecipeModel(recipeId: '2', title: 'Avocado Toast', costEstimate: 5.00, category: 'Breakfast', prepMinutes: 10),
-  RecipeModel(recipeId: '3', title: 'Vegan Buddha Bowl', costEstimate: 8.50, category: 'Vegan', prepMinutes: 30),
-  RecipeModel(recipeId: '4', title: 'Chicken Fried Rice', costEstimate: 7.00, category: 'Dinner', prepMinutes: 20),
-  RecipeModel(recipeId: '5', title: 'Greek Yogurt Parfait', costEstimate: 3.50, category: 'Breakfast', prepMinutes: 5),
-  RecipeModel(recipeId: '6', title: 'Lentil Soup', costEstimate: 5.50, category: 'Vegan', prepMinutes: 40),
-  RecipeModel(recipeId: '7', title: 'Turkey Power Wrap', costEstimate: 9.00, category: 'High Protein', prepMinutes: 15),
-  RecipeModel(recipeId: '8', title: 'Fluffy Egg Omelette', costEstimate: 4.00, category: 'Breakfast', prepMinutes: 12),
-  RecipeModel(recipeId: '9', title: 'Black Bean Tacos', costEstimate: 6.50, category: 'Vegan', prepMinutes: 20),
-  RecipeModel(recipeId: '10', title: 'Pesto Chicken Breast', costEstimate: 11.00, category: 'High Protein', prepMinutes: 30),
-];
-
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
 
@@ -46,68 +28,154 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  double _budget = _mockUser.globalBudget;
+  double _budget = 100.0;
   String _category = 'All';
-
-  List<RecipeModel> get _filtered => _mockRecipes.where((r) {
-        final inBudget = r.costEstimate <= _budget;
-        final bool matchesCategory;
-        if (_category == 'All') {
-          matchesCategory = true;
-        } else if (_category == 'Under 20 Mins') {
-          matchesCategory = r.prepMinutes != null && r.prepMinutes! <= 20;
-        } else {
-          matchesCategory = r.category == _category;
-        }
-        return inBudget && matchesCategory;
-      }).toList();
+  String _userName = '';
+  String? _currentUserID;
+  Set<String> _savedIds = {};
+  StreamSubscription<Set<String>>? _savedSub;
 
   @override
-  Widget build(BuildContext context) {
-    final filtered = _filtered;
+  void initState() {
+    super.initState();
+    _loadUser();
+  }
 
-    return SingleChildScrollView(
-      physics: const BouncingScrollPhysics(),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          _buildWelcome(),
-          _buildBudgetCard(),
-          _buildCategoryChips(),
-          _buildFeedHeader(filtered.length),
-          if (filtered.isEmpty) _buildEmptyState() else RecipeList(recipes: filtered),
-        ],
+  @override
+  void dispose() {
+    _savedSub?.cancel();
+    super.dispose();
+  }
+
+  Future<void> _loadUser() async {
+    final data = await DatabaseService.getCurrentUserData();
+    if (!mounted || data == null) return;
+
+    final budget = (data['budget'] as num?)?.toDouble() ?? 100.0;
+    final name = (data['displayName'] ?? '').toString();
+    final userId = (data['userID'] ?? '').toString();
+
+    setState(() {
+      _budget = budget.clamp(1.0, 500.0);
+      _userName = name;
+      _currentUserID = userId.isEmpty ? null : userId;
+    });
+
+    if (_currentUserID != null) {
+      _savedSub =
+          DatabaseService.savedRecipeIDsStream(_currentUserID!).listen((ids) {
+        if (mounted) setState(() => _savedIds = ids);
+      });
+    }
+  }
+
+  Future<void> _toggleSave(String recipeId, bool isSaved) async {
+    if (_currentUserID == null) return;
+    if (isSaved) {
+      await DatabaseService.unsaveRecipe(
+          recipeId: recipeId, userId: _currentUserID!);
+    } else {
+      await DatabaseService.saveRecipe(
+          recipeId: recipeId, userId: _currentUserID!);
+    }
+  }
+
+  void _openDetails(BuildContext context, RecipeModel recipe) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (_) => RecipeDetailsPage(
+          recipe: recipe,
+          isSaved: _savedIds.contains(recipe.recipeId),
+          userId: _currentUserID,
+        ),
       ),
     );
   }
 
+  @override
+  Widget build(BuildContext context) {
+    return StreamBuilder<List<RecipeModel>>(
+      stream: DatabaseService.recipesStream(),
+      builder: (context, snapshot) {
+        final allRecipes = snapshot.data ?? [];
+        final filtered = allRecipes.where((r) {
+          if (r.costEstimate > _budget) return false;
+          if (_category == 'All') return true;
+          if (_category == 'Under 20 Mins') {
+            return r.prepMinutes != null && r.prepMinutes! <= 20;
+          }
+          return r.category == _category;
+        }).toList();
+
+        final loading =
+            snapshot.connectionState == ConnectionState.waiting &&
+                allRecipes.isEmpty;
+
+        return SingleChildScrollView(
+          physics: const BouncingScrollPhysics(),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              _buildWelcome(),
+              _buildBudgetCard(),
+              _buildCategoryChips(),
+              _buildFeedHeader(filtered.length, loading),
+              if (loading)
+                const Padding(
+                  padding: EdgeInsets.only(top: 60),
+                  child: Center(
+                    child: CircularProgressIndicator(color: _walnut),
+                  ),
+                )
+              else if (filtered.isEmpty)
+                _buildEmptyState()
+              else
+                RecipeList(
+                  recipes: filtered,
+                  savedIds: _savedIds,
+                  onToggleSave: _toggleSave,
+                  onTap: (r) => _openDetails(context, r),
+                ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  // ── Welcome header ─────────────────────────────────────────────────────────
+
   Widget _buildWelcome() {
+    final displayName = _userName.isEmpty ? 'there' : _userName;
     return Padding(
       padding: const EdgeInsets.fromLTRB(20, 22, 20, 0),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                'Hello, ${_mockUser.name}',
-                style: const TextStyle(
-                  color: _white,
-                  fontSize: 24,
-                  fontWeight: FontWeight.w700,
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'Hello, $displayName',
+                  style: const TextStyle(
+                    color: _white,
+                    fontSize: 24,
+                    fontWeight: FontWeight.w700,
+                  ),
                 ),
-              ),
-              const SizedBox(height: 3),
-              const Text(
-                'What are you cooking today?',
-                style: TextStyle(color: _grey, fontSize: 13),
-              ),
-            ],
+                const SizedBox(height: 3),
+                const Text(
+                  'What are you cooking today?',
+                  style: TextStyle(color: _grey, fontSize: 13),
+                ),
+              ],
+            ),
           ),
-          const Spacer(),
           Container(
-            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+            padding:
+                const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
             decoration: BoxDecoration(
               color: const Color(0x168B5A2B),
               borderRadius: BorderRadius.circular(14),
@@ -118,11 +186,12 @@ class _HomePageState extends State<HomePage> {
               children: [
                 const Text(
                   'Current Limit',
-                  style: TextStyle(color: _grey, fontSize: 10, letterSpacing: 0.3),
+                  style: TextStyle(
+                      color: _grey, fontSize: 10, letterSpacing: 0.3),
                 ),
                 const SizedBox(height: 2),
                 Text(
-                  '\$${_budget.toStringAsFixed(2)}',
+                  '₱${_budget.toStringAsFixed(0)}',
                   style: const TextStyle(
                     color: _walnut,
                     fontSize: 17,
@@ -136,6 +205,8 @@ class _HomePageState extends State<HomePage> {
       ),
     );
   }
+
+  // ── Budget card ────────────────────────────────────────────────────────────
 
   Widget _buildBudgetCard() {
     return Container(
@@ -156,14 +227,13 @@ class _HomePageState extends State<HomePage> {
               const Text(
                 'Budget Control',
                 style: TextStyle(
-                  color: _white,
-                  fontSize: 14,
-                  fontWeight: FontWeight.w600,
-                ),
+                    color: _white,
+                    fontSize: 14,
+                    fontWeight: FontWeight.w600),
               ),
               const Spacer(),
               Text(
-                '\$${_budget.toStringAsFixed(0)}',
+                '₱${_budget.toStringAsFixed(0)}',
                 style: const TextStyle(
                   color: _walnut,
                   fontSize: 26,
@@ -176,19 +246,23 @@ class _HomePageState extends State<HomePage> {
           const SizedBox(height: 6),
           Row(
             children: [
-              const Text('\$1', style: TextStyle(color: _grey, fontSize: 11)),
+              const Text('₱1',
+                  style: TextStyle(color: _grey, fontSize: 11)),
               Expanded(
                 child: BudgetSlider(
                   value: _budget,
+                  min: 1,
+                  max: 500,
                   onChanged: (v) => setState(() => _budget = v),
                 ),
               ),
-              const Text('\$50', style: TextStyle(color: _grey, fontSize: 11)),
+              const Text('₱500',
+                  style: TextStyle(color: _grey, fontSize: 11)),
             ],
           ),
           Center(
             child: Text(
-              'Showing meals under \$${_budget.toStringAsFixed(0)}',
+              'Showing meals under ₱${_budget.toStringAsFixed(0)}',
               style: const TextStyle(
                 color: _grey,
                 fontSize: 12,
@@ -201,6 +275,8 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
+  // ── Category chips ─────────────────────────────────────────────────────────
+
   Widget _buildCategoryChips() {
     return Padding(
       padding: const EdgeInsets.only(top: 18),
@@ -210,7 +286,7 @@ class _HomePageState extends State<HomePage> {
           scrollDirection: Axis.horizontal,
           padding: const EdgeInsets.symmetric(horizontal: 20),
           itemCount: _categories.length,
-          separatorBuilder: (_, _) => const SizedBox(width: 8),
+          separatorBuilder: (_, i) => const SizedBox(width: 8),
           itemBuilder: (_, i) {
             final cat = _categories[i];
             final selected = cat == _category;
@@ -218,12 +294,14 @@ class _HomePageState extends State<HomePage> {
               onTap: () => setState(() => _category = cat),
               child: AnimatedContainer(
                 duration: const Duration(milliseconds: 180),
-                padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+                padding: const EdgeInsets.symmetric(
+                    horizontal: 14, vertical: 8),
                 decoration: BoxDecoration(
                   color: selected ? _walnut : _charcoal,
                   borderRadius: BorderRadius.circular(20),
                   border: Border.all(
-                    color: selected ? _walnut : const Color(0xFF3A3A3A),
+                    color:
+                        selected ? _walnut : const Color(0xFF3A3A3A),
                   ),
                 ),
                 child: Text(
@@ -231,7 +309,9 @@ class _HomePageState extends State<HomePage> {
                   style: TextStyle(
                     color: selected ? _white : _grey,
                     fontSize: 12.5,
-                    fontWeight: selected ? FontWeight.w600 : FontWeight.w400,
+                    fontWeight: selected
+                        ? FontWeight.w600
+                        : FontWeight.w400,
                   ),
                 ),
               ),
@@ -242,7 +322,9 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  Widget _buildFeedHeader(int count) {
+  // ── Feed header ────────────────────────────────────────────────────────────
+
+  Widget _buildFeedHeader(int count, bool loading) {
     return Padding(
       padding: const EdgeInsets.fromLTRB(20, 20, 20, 12),
       child: Row(
@@ -257,18 +339,28 @@ class _HomePageState extends State<HomePage> {
             ),
           ),
           const Spacer(),
-          Text(
-            '$count result${count == 1 ? '' : 's'}',
-            style: const TextStyle(
-              color: _walnut,
-              fontSize: 13,
-              fontWeight: FontWeight.w500,
+          if (loading)
+            const SizedBox(
+              width: 14,
+              height: 14,
+              child: CircularProgressIndicator(
+                  color: _walnut, strokeWidth: 2),
+            )
+          else
+            Text(
+              '$count result${count == 1 ? '' : 's'}',
+              style: const TextStyle(
+                color: _walnut,
+                fontSize: 13,
+                fontWeight: FontWeight.w500,
+              ),
             ),
-          ),
         ],
       ),
     );
   }
+
+  // ── Empty state ────────────────────────────────────────────────────────────
 
   Widget _buildEmptyState() {
     return const Padding(
@@ -281,7 +373,9 @@ class _HomePageState extends State<HomePage> {
             Text(
               'No recipes in this range',
               style: TextStyle(
-                  color: _white, fontSize: 16, fontWeight: FontWeight.w600),
+                  color: _white,
+                  fontSize: 16,
+                  fontWeight: FontWeight.w600),
             ),
             SizedBox(height: 6),
             Text(

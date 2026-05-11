@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import '../mainscaffhold.dart';
 
 const _black = Color(0xFF1A1A1A);
-const _charcoal = Color(0xFF2C2C2C);
 const _walnut = Color(0xFF8B5A2B);
 const _white = Colors.white;
 const _grey = Color(0xFF9E9E9E);
@@ -269,7 +268,6 @@ class _BrandingContent extends StatelessWidget {
           height: 108,
           decoration: BoxDecoration(
             shape: BoxShape.circle,
-            color: _charcoal,
             border: Border.all(color: _walnut, width: 2.5),
             boxShadow: const [
               BoxShadow(
@@ -279,38 +277,11 @@ class _BrandingContent extends StatelessWidget {
               ),
             ],
           ),
-          child: Stack(
-            alignment: Alignment.center,
-            children: [
-              Container(
-                width: 88,
-                height: 88,
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  border: Border.all(
-                    color: Color.fromRGBO(139, 90, 43, 0.22),
-                    width: 1,
-                  ),
-                ),
-              ),
-              const Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Text(
-                    'S',
-                    style: TextStyle(
-                      color: _walnut,
-                      fontSize: 48,
-                      fontWeight: FontWeight.w900,
-                      height: 1.0,
-                      letterSpacing: -1,
-                    ),
-                  ),
-                  SizedBox(height: 3),
-                  Icon(Icons.restaurant, color: _walnut, size: 15),
-                ],
-              ),
-            ],
+          child: ClipOval(
+            child: Image.asset(
+              'assets/filler.jpg',
+              fit: BoxFit.cover,
+            ),
           ),
         ),
         const SizedBox(height: 22),

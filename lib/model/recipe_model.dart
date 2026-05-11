@@ -33,7 +33,9 @@ class RecipeModel {
       ingredients: List<String>.from(data['ingredients'] ?? []),
       instructions: instructionsList,
       imageUrl: data['image_url'],
-      prepMinutes: (data['cooking_time'] ?? data['prep_minutes'])?.toInt(),
+      prepMinutes: data['cooking_time'] != null
+          ? (data['cooking_time'] as num).toInt() ~/ 1000
+          : (data['prep_minutes'] as num?)?.toInt(),
     );
   }
 }

@@ -8,11 +8,13 @@ class RecipeList extends StatelessWidget {
     required this.recipes,
     this.savedIds = const {},
     this.onToggleSave,
+    this.onTap,
   });
 
   final List<RecipeModel> recipes;
   final Set<String> savedIds;
   final void Function(String recipeId, bool isSaved)? onToggleSave;
+  final void Function(RecipeModel recipe)? onTap;
 
   @override
   Widget build(BuildContext context) {
@@ -36,6 +38,7 @@ class RecipeList extends StatelessWidget {
           onToggleSave: onToggleSave != null
               ? () => onToggleSave!(recipe.recipeId, saved)
               : null,
+          onTap: onTap != null ? () => onTap!(recipe) : null,
         );
       },
     );

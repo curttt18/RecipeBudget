@@ -7,6 +7,7 @@ import 'screens/profile.dart';
 import 'screens/recipedetails.dart';
 import 'screens/recipelist.dart';
 import 'screens/register.dart';
+import 'screens/meal_plan.dart';
 import 'screens/settings.dart';
 import 'services/database.dart';
 
@@ -42,7 +43,7 @@ class MainScaffold extends StatefulWidget {
 class _MainScaffoldState extends State<MainScaffold> {
   int _currentIndex = 0;
 
-  static const _titles = ['Savr', 'Browse Recipes', 'My Recipes', 'Settings'];
+  static const _titles = ['Savr', 'Browse Recipes', 'My Recipes', 'Meal Plan'];
 
   @override
   Widget build(BuildContext context) {
@@ -70,7 +71,39 @@ class _MainScaffoldState extends State<MainScaffold> {
         actions: [
           IconButton(
             icon: const Icon(Icons.person_outline_rounded, color: Color(0xFF8B5A2B)),
-            onPressed: () => setState(() => _currentIndex = 3),
+            onPressed: () => Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (_) => Scaffold(
+                  backgroundColor: const Color(0xFF1A1A1A),
+                  appBar: AppBar(
+                    backgroundColor: const Color(0xFF2C2C2C),
+                    elevation: 0,
+                    leading: IconButton(
+                      icon: const Icon(Icons.arrow_back_ios_rounded,
+                          color: Color(0xFF8B5A2B), size: 20),
+                      onPressed: () => Navigator.pop(context),
+                    ),
+                    title: const Text(
+                      'Settings',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontWeight: FontWeight.w800,
+                        letterSpacing: 3,
+                        fontSize: 20,
+                      ),
+                    ),
+                    centerTitle: true,
+                    bottom: PreferredSize(
+                      preferredSize: const Size.fromHeight(1),
+                      child: Container(
+                          height: 1, color: const Color(0xFF3A3A3A)),
+                    ),
+                  ),
+                  body: const SettingsPage(),
+                ),
+              ),
+            ),
           ),
         ],
       ),
@@ -88,7 +121,7 @@ class _MainScaffoldState extends State<MainScaffold> {
           HomePage(),
           _RecipeBrowserPage(),
           MyRecipesPage(),
-          SettingsPage(),
+          MealPlanPage(),
         ],
       ),
       bottomNavigationBar: Container(
@@ -119,8 +152,8 @@ class _MainScaffoldState extends State<MainScaffold> {
               label: 'My Recipes',
             ),
             BottomNavigationBarItem(
-              icon: Icon(Icons.settings_rounded),
-              label: 'Settings',
+              icon: Icon(Icons.calendar_month_rounded),
+              label: 'Meal Plan',
             ),
           ],
         ),
@@ -165,8 +198,8 @@ class _SavrDrawer extends StatelessWidget {
             onTap: () => onNavigate(2),
           ),
           _NavItem(
-            icon: Icons.settings_rounded,
-            label: 'Settings',
+            icon: Icons.calendar_month_rounded,
+            label: 'Meal Plan',
             selected: currentIndex == 3,
             onTap: () => onNavigate(3),
           ),

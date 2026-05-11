@@ -31,6 +31,42 @@ class AuthService {
     }
   }
 
+  static Future<String?> login({
+    required String email,
+    required String password,
+  }) async {
+    try {
+      await _auth.signInWithEmailAndPassword(
+        email: email.trim(),
+        password: password,
+      );
+      return null;
+    } on FirebaseAuthException catch (e) {
+      return _mapLoginError(e.code);
+    } catch (_) {
+      return 'Something went wrong. Please try again.';
+    }
+  }
+
+  static String _mapLoginError(String code) {
+    switch (code) {
+      case 'user-not-found':
+        return 'No account found with this email.';
+      case 'wrong-password':
+        return 'Incorrect password. Please try again.';
+      case 'invalid-email':
+        return 'Enter a valid email address.';
+      case 'invalid-credential':
+        return 'Invalid email or password.';
+      case 'too-many-requests':
+        return 'Too many failed attempts. Please try again later.';
+      case 'user-disabled':
+        return 'This account has been disabled.';
+      default:
+        return 'Login failed. Please check your credentials.';
+    }
+  }
+
   static Future<String?> resetPassword(String email) async {
     try {
       await _auth.sendPasswordResetEmail(email: email.trim());

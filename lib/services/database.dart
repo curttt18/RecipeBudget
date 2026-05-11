@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import '../model/meal_plan_model.dart';
 import '../model/recipe_model.dart';
 
 class DatabaseService {
@@ -108,6 +109,57 @@ class DatabaseService {
         .map((snap) => snap.docs
             .map((doc) => (doc.data()['recipe_id'] ?? '').toString())
             .toSet());
+  }
+
+  // ── Meal plans ──────────────────────────────────────────────────────────
+
+  static Future<String> _generateMealID() async {
+    final year = DateTime.now().year;
+    final snap = await _db
+        .collection('tbl_mealplans')
+        .where('meal_id', isGreaterThanOrEqualTo: '${year}000')
+        .where('meal_id', isLessThan: '${year + 1}000')
+        .get();
+    final seq = (snap.docs.length + 1).toString().padLeft(3, '0');
+    return '$year$seq';
+  }
+
+  static Future<void> createMealPlan({
+    required String userId,
+    required String planName,
+    required String planDetails,
+    required String notes,
+    required DateTime schedule,
+    required List<String> recipeIds,
+  }) async {
+    final mealId = await _generateMealID();
+    await _db.collection('tbl_mealplans').add({
+      'meal_id': mealId,
+      'plan_name': planName,
+      'plan_details': planDetails,
+      'notes': notes,
+      'schedule': Timestamp.fromDate(schedule),
+      'recipe_id': recipeIds,
+      'user_id': userId,
+    });
+  }
+
+  static Stream<List<MealPlanModel>> mealPlansStream(String userId) {
+    return _db
+        .collection('tbl_mealplans')
+        .where('user_id', isEqualTo: userId)
+        .snapshots()
+        .map((snap) {
+          final plans = snap.docs
+              .map((doc) => MealPlanModel.fromFirestore(doc.data(), doc.id))
+              .toList();
+          plans.sort((a, b) => a.schedule.compareTo(b.schedule));
+          return plans;
+        });
+  }
+
+  static Future<void> deleteMealPlan(String docId) async {
+    await _db.collection('tbl_mealplans').doc(docId).delete();
   }
 
   // ── Recipes ─────────────────────────────────────────────────────────────

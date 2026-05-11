@@ -23,6 +23,8 @@ class _LoginPageState extends State<LoginPage>
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
   bool _obscurePass = true;
+  bool _loading = false;
+  String? _errorMsg;
   late final AnimationController _slashController;
 
   @override
@@ -40,6 +42,41 @@ class _LoginPageState extends State<LoginPage>
     _emailController.dispose();
     _passwordController.dispose();
     super.dispose();
+  }
+
+  Future<void> _login() async {
+    final email = _emailController.text.trim();
+    final password = _passwordController.text;
+
+    if (email.isEmpty) {
+      setState(() => _errorMsg = 'Please enter your email address.');
+      return;
+    }
+    if (password.isEmpty) {
+      setState(() => _errorMsg = 'Please enter your password.');
+      return;
+    }
+
+    setState(() {
+      _loading = true;
+      _errorMsg = null;
+    });
+
+    final error = await AuthService.login(email: email, password: password);
+
+    if (!mounted) return;
+
+    if (error != null) {
+      setState(() {
+        _errorMsg = error;
+        _loading = false;
+      });
+    } else {
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (_) => const LoadingScreen()),
+      );
+    }
   }
 
   void _showForgotPasswordSheet() {
@@ -293,31 +330,66 @@ class _LoginPageState extends State<LoginPage>
                   ),
                 ),
               ),
-              const SizedBox(height: 28),
+              if (_errorMsg != null) ...[
+                const SizedBox(height: 16),
+                Container(
+                  padding: const EdgeInsets.symmetric(
+                      horizontal: 14, vertical: 10),
+                  decoration: BoxDecoration(
+                    color: Colors.red.shade900.withValues(alpha: 0.25),
+                    borderRadius: BorderRadius.circular(10),
+                    border: Border.all(
+                        color: Colors.red.shade800.withValues(alpha: 0.6)),
+                  ),
+                  child: Row(
+                    children: [
+                      Icon(Icons.error_outline_rounded,
+                          color: Colors.red.shade400, size: 16),
+                      const SizedBox(width: 8),
+                      Expanded(
+                        child: Text(
+                          _errorMsg!,
+                          style: TextStyle(
+                              color: Colors.red.shade300, fontSize: 12.5),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+              const SizedBox(height: 20),
               SizedBox(
                 width: double.infinity,
                 height: 54,
                 child: ElevatedButton(
-                  onPressed: () => Navigator.pushReplacement(
-                    context,
-                    MaterialPageRoute(builder: (_) => const LoadingScreen()),
-                  ),
+                  onPressed: _loading ? null : _login,
                   style: ElevatedButton.styleFrom(
                     backgroundColor: _walnut,
+                    disabledBackgroundColor:
+                        _walnut.withValues(alpha: 0.6),
                     foregroundColor: _white,
                     elevation: 0,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(14),
                     ),
                   ),
-                  child: const Text(
-                    'Log In',
-                    style: TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.w600,
-                      letterSpacing: 0.5,
-                    ),
-                  ),
+                  child: _loading
+                      ? const SizedBox(
+                          width: 22,
+                          height: 22,
+                          child: CircularProgressIndicator(
+                            color: _white,
+                            strokeWidth: 2.5,
+                          ),
+                        )
+                      : const Text(
+                          'Log In',
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w600,
+                            letterSpacing: 0.5,
+                          ),
+                        ),
                 ),
               ),
               const SizedBox(height: 20),

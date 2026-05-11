@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'aboutus.dart';
 
 const _charcoal = Color(0xFF2C2C2C);
 const _walnut = Color(0xFF8B5A2B);
@@ -75,7 +76,10 @@ class _SettingsPageState extends State<SettingsPage> {
               icon: Icons.info_outline_rounded,
               title: 'About Savr',
               subtitle: 'Version 1.0.0',
-              onTap: () {},
+              onTap: () => Navigator.push(
+                context,
+                MaterialPageRoute(builder: (_) => const AboutUsPage()),
+              ),
             ),
             _SettingsTile(
               icon: Icons.help_outline_rounded,

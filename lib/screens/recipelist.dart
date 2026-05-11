@@ -3,9 +3,16 @@ import '../model/recipe_model.dart';
 import 'recipe_card.dart';
 
 class RecipeList extends StatelessWidget {
-  const RecipeList({super.key, required this.recipes});
+  const RecipeList({
+    super.key,
+    required this.recipes,
+    this.savedIds = const {},
+    this.onToggleSave,
+  });
 
   final List<RecipeModel> recipes;
+  final Set<String> savedIds;
+  final void Function(String recipeId, bool isSaved)? onToggleSave;
 
   @override
   Widget build(BuildContext context) {
@@ -20,7 +27,17 @@ class RecipeList extends StatelessWidget {
         childAspectRatio: 0.70,
       ),
       itemCount: recipes.length,
-      itemBuilder: (_, i) => RecipeCard(recipe: recipes[i]),
+      itemBuilder: (_, i) {
+        final recipe = recipes[i];
+        final saved = savedIds.contains(recipe.recipeId);
+        return RecipeCard(
+          recipe: recipe,
+          isSaved: saved,
+          onToggleSave: onToggleSave != null
+              ? () => onToggleSave!(recipe.recipeId, saved)
+              : null,
+        );
+      },
     );
   }
 }

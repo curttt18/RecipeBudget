@@ -18,8 +18,9 @@ class AuthService {
       );
       await DatabaseService.createUser(
         uid: credential.user!.uid,
-        name: name,
+        displayName: name,
         email: email,
+        password: password,
         budget: budget,
       );
       return null;

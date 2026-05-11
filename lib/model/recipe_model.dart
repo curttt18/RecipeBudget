@@ -20,15 +20,20 @@ class RecipeModel {
   final int? prepMinutes;
 
   factory RecipeModel.fromFirestore(Map<String, dynamic> data, String id) {
+    final raw = data['instructions'];
+    final instructionsList = raw is String
+        ? [raw]
+        : List<String>.from(raw ?? []);
+
     return RecipeModel(
       recipeId: id,
       title: data['title'] ?? '',
       costEstimate: (data['cost_estimate'] ?? 0).toDouble(),
       category: data['category'] ?? '',
       ingredients: List<String>.from(data['ingredients'] ?? []),
-      instructions: List<String>.from(data['instructions'] ?? []),
+      instructions: instructionsList,
       imageUrl: data['image_url'],
-      prepMinutes: data['prep_minutes'],
+      prepMinutes: (data['cooking_time'] ?? data['prep_minutes'])?.toInt(),
     );
   }
 }

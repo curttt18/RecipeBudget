@@ -6,9 +6,16 @@ const _walnut = Color(0xFF8B5A2B);
 const _grey = Color(0xFF9E9E9E);
 
 class RecipeCard extends StatelessWidget {
-  const RecipeCard({super.key, required this.recipe});
+  const RecipeCard({
+    super.key,
+    required this.recipe,
+    this.isSaved = false,
+    this.onToggleSave,
+  });
 
   final RecipeModel recipe;
+  final bool isSaved;
+  final VoidCallback? onToggleSave;
 
   @override
   Widget build(BuildContext context) {
@@ -24,9 +31,35 @@ class RecipeCard extends StatelessWidget {
         children: [
           Expanded(
             flex: 55,
-            child: _ImagePlaceholder(
-              category: recipe.category,
-              imageUrl: recipe.imageUrl,
+            child: Stack(
+              children: [
+                Positioned.fill(
+                  child: _ImagePlaceholder(
+                    category: recipe.category,
+                    imageUrl: recipe.imageUrl,
+                  ),
+                ),
+                Positioned(
+                  bottom: 8,
+                  right: 8,
+                  child: GestureDetector(
+                    onTap: onToggleSave,
+                    child: Container(
+                      width: 30,
+                      height: 30,
+                      decoration: BoxDecoration(
+                        color: const Color.fromRGBO(0, 0, 0, 0.55),
+                        shape: BoxShape.circle,
+                      ),
+                      child: Icon(
+                        isSaved ? Icons.favorite_rounded : Icons.favorite_border_rounded,
+                        color: isSaved ? Color(0xFFE57373) : _white,
+                        size: 16,
+                      ),
+                    ),
+                  ),
+                ),
+              ],
             ),
           ),
           Expanded(

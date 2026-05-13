@@ -74,36 +74,7 @@ class _MainScaffoldState extends State<MainScaffold> {
             icon: const Icon(Icons.person_outline_rounded, color: Color(0xFF8B5A2B)),
             onPressed: () => Navigator.push(
               context,
-              MaterialPageRoute(
-                builder: (_) => Scaffold(
-                  backgroundColor: c.background,
-                  appBar: AppBar(
-                    backgroundColor: c.surface,
-                    elevation: 0,
-                    leading: IconButton(
-                      icon: const Icon(Icons.arrow_back_ios_rounded,
-                          color: Color(0xFF8B5A2B), size: 20),
-                      onPressed: () => Navigator.pop(context),
-                    ),
-                    title: Text(
-                      'Settings',
-                      style: TextStyle(
-                        color: c.onSurface,
-                        fontWeight: FontWeight.w800,
-                        letterSpacing: 3,
-                        fontSize: 20,
-                      ),
-                    ),
-                    centerTitle: true,
-                    bottom: PreferredSize(
-                      preferredSize: const Size.fromHeight(1),
-                      child: Container(
-                          height: 1, color: c.border),
-                    ),
-                  ),
-                  body: const SettingsPage(),
-                ),
-              ),
+              MaterialPageRoute(builder: (_) => const _SettingsShell()),
             ),
           ),
         ],
@@ -118,11 +89,11 @@ class _MainScaffoldState extends State<MainScaffold> {
       // IndexedStack preserves each page's scroll and state across tab switches
       body: IndexedStack(
         index: _currentIndex,
-        children: const [
-          HomePage(),
-          _RecipeBrowserPage(),
-          MyRecipesPage(),
-          MealPlanPage(),
+        children: [
+          const HomePage(),
+          const _RecipeBrowserPage(),
+          MyRecipesPage(onBrowse: () => setState(() => _currentIndex = 1)),
+          const MealPlanPage(),
         ],
       ),
       bottomNavigationBar: Container(
@@ -836,6 +807,44 @@ class _RecipeBrowserPageState extends State<_RecipeBrowserPage> {
           ),
         );
       },
+    );
+  }
+}
+
+// ── Settings shell ─────────────────────────────────────────────────────────────
+
+class _SettingsShell extends StatelessWidget {
+  const _SettingsShell();
+
+  @override
+  Widget build(BuildContext context) {
+    final c = AppColors.of(context);
+    return Scaffold(
+      backgroundColor: c.background,
+      appBar: AppBar(
+        backgroundColor: c.surface,
+        elevation: 0,
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back_ios_rounded,
+              color: Color(0xFF8B5A2B), size: 20),
+          onPressed: () => Navigator.pop(context),
+        ),
+        title: Text(
+          'Settings',
+          style: TextStyle(
+            color: c.onSurface,
+            fontWeight: FontWeight.w800,
+            letterSpacing: 3,
+            fontSize: 20,
+          ),
+        ),
+        centerTitle: true,
+        bottom: PreferredSize(
+          preferredSize: const Size.fromHeight(1),
+          child: Container(height: 1, color: c.border),
+        ),
+      ),
+      body: const SettingsPage(),
     );
   }
 }

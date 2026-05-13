@@ -1,5 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+
 import '../services/auth_service.dart';
 import '../services/database.dart';
 import '../theme/app_theme.dart';
@@ -470,6 +471,156 @@ class _SettingsPageState extends State<SettingsPage> {
     );
   }
 
+  void _showBudgetModal() {
+    final budgetCtrl = TextEditingController(
+      text: _budget > 0 ? _budget.toStringAsFixed(0) : '',
+    );
+
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (ctx) {
+        bool saving = false;
+        String? errorMsg;
+        return StatefulBuilder(
+          builder: (ctx, setModalState) => Padding(
+            padding: EdgeInsets.only(bottom: MediaQuery.of(ctx).viewInsets.bottom),
+            child: Container(
+              padding: const EdgeInsets.fromLTRB(24, 12, 24, 32),
+              decoration: BoxDecoration(
+                color: AppColors.of(ctx).modal,
+                borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
+              ),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Container(
+                    width: 40,
+                    height: 4,
+                    margin: const EdgeInsets.only(bottom: 20),
+                    decoration: BoxDecoration(
+                      color: AppColors.of(ctx).border,
+                      borderRadius: BorderRadius.circular(2),
+                    ),
+                  ),
+                  Align(
+                    alignment: Alignment.centerLeft,
+                    child: Text(
+                      'Budget Settings',
+                      style: TextStyle(
+                        color: AppColors.of(ctx).onSurface,
+                        fontSize: 18,
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 6),
+                  Align(
+                    alignment: Alignment.centerLeft,
+                    child: Text(
+                      'Set your default budget per meal in Philippine Peso.',
+                      style: TextStyle(color: AppColors.of(ctx).subtext, fontSize: 13),
+                    ),
+                  ),
+                  const SizedBox(height: 24),
+                  TextField(
+                    controller: budgetCtrl,
+                    keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                    autofocus: true,
+                    style: TextStyle(color: AppColors.of(ctx).onSurface, fontSize: 14),
+                    decoration: InputDecoration(
+                      labelText: 'Budget per meal',
+                      labelStyle: TextStyle(color: AppColors.of(ctx).subtext, fontSize: 13),
+                      prefixIcon: const Icon(Icons.attach_money_rounded, color: _walnut, size: 20),
+                      prefixText: '₱ ',
+                      prefixStyle: TextStyle(color: AppColors.of(ctx).onSurface, fontSize: 14),
+                      filled: true,
+                      fillColor: AppColors.of(ctx).surface,
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
+                        borderSide: BorderSide(color: AppColors.of(ctx).border),
+                      ),
+                      enabledBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
+                        borderSide: BorderSide(color: AppColors.of(ctx).border),
+                      ),
+                      focusedBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
+                        borderSide: const BorderSide(color: _walnut, width: 1.5),
+                      ),
+                    ),
+                  ),
+                  if (errorMsg != null) ...[
+                    const SizedBox(height: 12),
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+                      decoration: BoxDecoration(
+                        color: Colors.red.shade900.withValues(alpha: 0.25),
+                        borderRadius: BorderRadius.circular(10),
+                        border: Border.all(color: Colors.red.shade800.withValues(alpha: 0.6)),
+                      ),
+                      child: Row(
+                        children: [
+                          Icon(Icons.error_outline_rounded, color: Colors.red.shade400, size: 16),
+                          const SizedBox(width: 8),
+                          Expanded(
+                            child: Text(
+                              errorMsg!,
+                              style: TextStyle(color: Colors.red.shade300, fontSize: 12.5),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                  const SizedBox(height: 28),
+                  SizedBox(
+                    width: double.infinity,
+                    height: 50,
+                    child: ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: _walnut,
+                        disabledBackgroundColor: _walnut.withValues(alpha: 0.6),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(14),
+                        ),
+                      ),
+                      onPressed: saving
+                          ? null
+                          : () async {
+                              final parsed = double.tryParse(budgetCtrl.text.trim());
+                              if (parsed == null || parsed <= 0) {
+                                setModalState(() => errorMsg = 'Please enter a valid budget amount.');
+                                return;
+                              }
+                              setModalState(() { saving = true; errorMsg = null; });
+                              await DatabaseService.updateBudget(parsed);
+                              budgetNotifier.value = parsed;
+                              if (mounted) setState(() => _budget = parsed);
+                              if (ctx.mounted) Navigator.pop(ctx);
+                            },
+                      child: saving
+                          ? const SizedBox(
+                              width: 20,
+                              height: 20,
+                              child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2),
+                            )
+                          : const Text(
+                              'Save Budget',
+                              style: TextStyle(color: Colors.white, fontSize: 15, fontWeight: FontWeight.w600),
+                            ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        );
+      },
+    );
+  }
+
   void _showPrivacyPolicyModal() {
     showModalBottomSheet(
       context: context,
@@ -630,7 +781,7 @@ class _SettingsPageState extends State<SettingsPage> {
             _SettingsTile(
               icon: Icons.person_outline_rounded,
               title: 'Edit Profile',
-              subtitle: 'Name, email, avatar',
+              subtitle: 'Name, email',
               onTap: _showEditProfileModal,
             ),
             _SettingsTile(
@@ -642,7 +793,7 @@ class _SettingsPageState extends State<SettingsPage> {
               icon: Icons.attach_money_rounded,
               title: 'Budget Settings',
               subtitle: 'Adjust your default meal budget',
-              onTap: () {},
+              onTap: _showBudgetModal,
             ),
           ]),
           const SizedBox(height: 20),
@@ -659,12 +810,6 @@ class _SettingsPageState extends State<SettingsPage> {
                 activeTrackColor: _walnut.withValues(alpha: 0.4),
                 inactiveTrackColor: const Color(0xFFDDDDDD),
               ),
-            ),
-            _SettingsTile(
-              icon: Icons.language_outlined,
-              title: 'Language',
-              subtitle: 'English',
-              onTap: () {},
             ),
           ]),
           const SizedBox(height: 20),
@@ -756,7 +901,7 @@ class _SettingsPageState extends State<SettingsPage> {
                       ),
                       const SizedBox(height: 3),
                       Text(
-                        'Budget: \$${_budget.toStringAsFixed(2)} / meal',
+                        'Budget: ₱${_budget.toStringAsFixed(2)} / meal',
                         style: const TextStyle(
                           color: _walnut,
                           fontSize: 12,

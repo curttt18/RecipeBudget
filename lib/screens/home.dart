@@ -32,39 +32,42 @@ class _HomePageState extends State<HomePage> {
   String? _currentUserID;
   Set<String> _savedIds = {};
   StreamSubscription<Set<String>>? _savedSub;
+  StreamSubscription<Map<String, dynamic>?>? _userSub;
 
   @override
   void initState() {
     super.initState();
-    _loadUser();
+    _userSub = DatabaseService.userDataStream().listen(_onUserData);
   }
 
-  @override
-  void dispose() {
-    _savedSub?.cancel();
-    super.dispose();
-  }
-
-  Future<void> _loadUser() async {
-    final data = await DatabaseService.getCurrentUserData();
+  void _onUserData(Map<String, dynamic>? data) {
     if (!mounted || data == null) return;
 
     final budget = (data['budget'] as num?)?.toDouble() ?? 100.0;
     final name = (data['displayName'] ?? '').toString();
     final userId = (data['userID'] ?? '').toString();
 
+    budgetNotifier.value = budget;
+
     setState(() {
-      _budget = budget.clamp(1.0, 500.0);
+      _budget = budget;
       _userName = name;
-      _currentUserID = userId.isEmpty ? null : userId;
     });
 
-    if (_currentUserID != null) {
+    if (_currentUserID == null && userId.isNotEmpty) {
+      _currentUserID = userId;
       _savedSub =
-          DatabaseService.savedRecipeIDsStream(_currentUserID!).listen((ids) {
+          DatabaseService.savedRecipeIDsStream(userId).listen((ids) {
         if (mounted) setState(() => _savedIds = ids);
       });
     }
+  }
+
+  @override
+  void dispose() {
+    _userSub?.cancel();
+    _savedSub?.cancel();
+    super.dispose();
   }
 
   Future<void> _toggleSave(String recipeId, bool isSaved) async {
@@ -250,11 +253,11 @@ class _HomePageState extends State<HomePage> {
                 child: BudgetSlider(
                   value: _budget,
                   min: 1,
-                  max: 500,
+                  max: _budget > 500 ? _budget : 500,
                   onChanged: (v) => setState(() => _budget = v),
                 ),
               ),
-              Text('₱500',
+              Text('₱${(_budget > 500 ? _budget : 500).toStringAsFixed(0)}',
                   style: TextStyle(color: AppColors.of(context).subtext, fontSize: 11)),
             ],
           ),

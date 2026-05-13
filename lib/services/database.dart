@@ -60,6 +60,12 @@ class DatabaseService {
     await _db.collection('tbl_users').doc(uid).update({'password': newPassword});
   }
 
+  static Future<void> updateBudget(double budget) async {
+    final uid = FirebaseAuth.instance.currentUser?.uid;
+    if (uid == null) return;
+    await _db.collection('tbl_users').doc(uid).update({'budget': budget});
+  }
+
   static Future<void> updateUserProfile({
     String? displayName,
     String? email,
@@ -91,6 +97,16 @@ class DatabaseService {
     if (uid == null) return null;
     final doc = await _db.collection('tbl_users').doc(uid).get();
     return doc.data();
+  }
+
+  static Stream<Map<String, dynamic>?> userDataStream() {
+    final uid = FirebaseAuth.instance.currentUser?.uid;
+    if (uid == null) return const Stream.empty();
+    return _db
+        .collection('tbl_users')
+        .doc(uid)
+        .snapshots()
+        .map((doc) => doc.data());
   }
 
   static Future<int> _nextSavedRecipeID() async {

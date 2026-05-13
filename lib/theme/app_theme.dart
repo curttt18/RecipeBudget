@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 final themeModeNotifier = ValueNotifier<ThemeMode>(ThemeMode.dark);
+final budgetNotifier = ValueNotifier<double>(100.0);
 
 class AppColors {
   const AppColors({

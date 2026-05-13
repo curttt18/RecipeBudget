@@ -1,14 +1,11 @@
 import 'package:flutter/material.dart';
 
 import '../services/auth_service.dart';
+import '../theme/app_theme.dart';
 import 'loading_screen.dart';
 import 'login.dart';
 
-const _black = Color(0xFF1A1A1A);
-const _charcoal = Color(0xFF2C2C2C);
 const _walnut = Color(0xFF8B5A2B);
-const _white = Colors.white;
-const _grey = Color(0xFF9E9E9E);
 
 class RegisterPage extends StatefulWidget {
   const RegisterPage({super.key});
@@ -81,7 +78,7 @@ class _RegisterPageState extends State<RegisterPage>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: _black,
+      backgroundColor: AppColors.of(context).background,
       body: Stack(
         children: [
           AnimatedBuilder(
@@ -102,11 +99,11 @@ class _RegisterPageState extends State<RegisterPage>
                   const SizedBox(height: 18),
                   
                   const SizedBox(height: 10),
-                  const Text(
+                  Text(
                     '"Empowering home cooks to eat well and spend wisely."',
                     textAlign: TextAlign.center,
                     style: TextStyle(
-                      color: _grey,
+                      color: AppColors.of(context).subtext,
                       fontSize: 11,
                       fontStyle: FontStyle.italic,
                       height: 1.6,
@@ -115,23 +112,23 @@ class _RegisterPageState extends State<RegisterPage>
                   const SizedBox(height: 36),
                   const _SectionDivider(),
                   const SizedBox(height: 28),
-                  const Align(
+                  Align(
                     alignment: Alignment.centerLeft,
                     child: Text(
                       'Create Account',
                       style: TextStyle(
-                        color: _white,
+                        color: AppColors.of(context).onSurface,
                         fontSize: 22,
                         fontWeight: FontWeight.w700,
                       ),
                     ),
                   ),
                   const SizedBox(height: 4),
-                  const Align(
+                  Align(
                     alignment: Alignment.centerLeft,
                     child: Text(
                       'Join Savr and start saving today.',
-                      style: TextStyle(color: _grey, fontSize: 13),
+                      style: TextStyle(color: AppColors.of(context).subtext, fontSize: 13),
                     ),
                   ),
                   const SizedBox(height: 24),
@@ -197,15 +194,19 @@ class _RegisterPageState extends State<RegisterPage>
                         _Field(
                           controller: _budgetController,
                           label: 'Starting Meal Budget',
-                          icon: Icons.attach_money_rounded,
-                          keyboardType: TextInputType.number,
-                          prefix: const Text(
-                            '\$ ',
-                            style: TextStyle(
-                                color: _walnut,
-                                fontSize: 14,
-                                fontWeight: FontWeight.w600),
+                          prefixIconWidget: const SizedBox(
+                            width: 40,
+                            child: Center(
+                              child: Text(
+                                '₱',
+                                style: TextStyle(
+                                    color: _walnut,
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.w600),
+                              ),
+                            ),
                           ),
+                          keyboardType: TextInputType.number,
                           validator: (v) {
                             if (v == null || v.trim().isEmpty) {
                               return 'Budget is required';
@@ -256,7 +257,7 @@ class _RegisterPageState extends State<RegisterPage>
                               backgroundColor: _walnut,
                               disabledBackgroundColor:
                                   const Color(0xFF6B4420),
-                              foregroundColor: _white,
+                              foregroundColor: Colors.white,
                               elevation: 0,
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(14),
@@ -267,7 +268,7 @@ class _RegisterPageState extends State<RegisterPage>
                                     width: 22,
                                     height: 22,
                                     child: CircularProgressIndicator(
-                                      color: _white,
+                                      color: Colors.white,
                                       strokeWidth: 2.5,
                                     ),
                                   )
@@ -285,9 +286,9 @@ class _RegisterPageState extends State<RegisterPage>
                         Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            const Text(
+                            Text(
                               'Already have an account?  ',
-                              style: TextStyle(color: _grey, fontSize: 14),
+                              style: TextStyle(color: AppColors.of(context).subtext, fontSize: 14),
                             ),
                             GestureDetector(
                               onTap: () => Navigator.push(
@@ -446,21 +447,21 @@ class _Field extends StatelessWidget {
   const _Field({
     required this.controller,
     required this.label,
-    required this.icon,
+    this.icon,
+    this.prefixIconWidget,
     this.obscure = false,
     this.keyboardType,
     this.suffixIcon,
-    this.prefix,
     this.validator,
   });
 
   final TextEditingController controller;
   final String label;
-  final IconData icon;
+  final IconData? icon;
+  final Widget? prefixIconWidget;
   final bool obscure;
   final TextInputType? keyboardType;
   final Widget? suffixIcon;
-  final Widget? prefix;
   final String? Function(String?)? validator;
 
   @override
@@ -470,22 +471,21 @@ class _Field extends StatelessWidget {
       obscureText: obscure,
       keyboardType: keyboardType,
       validator: validator,
-      style: const TextStyle(color: _white, fontSize: 14),
+      style: TextStyle(color: AppColors.of(context).onSurface, fontSize: 14),
       decoration: InputDecoration(
         labelText: label,
-        labelStyle: const TextStyle(color: _grey, fontSize: 13),
-        prefixIcon: Icon(icon, color: _walnut, size: 20),
-        prefix: prefix,
+        labelStyle: TextStyle(color: AppColors.of(context).subtext, fontSize: 13),
+        prefixIcon: prefixIconWidget ?? (icon != null ? Icon(icon!, color: _walnut, size: 20) : null),
         suffixIcon: suffixIcon,
         filled: true,
-        fillColor: _charcoal,
+        fillColor: AppColors.of(context).surface,
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
           borderSide: BorderSide.none,
         ),
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
-          borderSide: const BorderSide(color: Color(0xFF3A3A3A), width: 1),
+          borderSide: BorderSide(color: AppColors.of(context).border, width: 1),
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
@@ -508,7 +508,7 @@ class _VisibilityToggle extends StatelessWidget {
     return IconButton(
       icon: Icon(
         obscure ? Icons.visibility_off_outlined : Icons.visibility_outlined,
-        color: _grey,
+        color: AppColors.of(context).subtext,
         size: 20,
       ),
       onPressed: onTap,
@@ -523,12 +523,12 @@ class _SectionDivider extends StatelessWidget {
   Widget build(BuildContext context) {
     return Row(
       children: [
-        Expanded(child: Divider(color: _charcoal, thickness: 1)),
+        Expanded(child: Divider(color: AppColors.of(context).surface, thickness: 1)),
         const Padding(
           padding: EdgeInsets.symmetric(horizontal: 12),
           child: Icon(Icons.restaurant, color: _walnut, size: 14),
         ),
-        Expanded(child: Divider(color: _charcoal, thickness: 1)),
+        Expanded(child: Divider(color: AppColors.of(context).surface, thickness: 1)),
       ],
     );
   }

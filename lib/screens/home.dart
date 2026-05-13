@@ -2,14 +2,12 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import '../model/recipe_model.dart';
 import '../services/database.dart';
+import '../theme/app_theme.dart';
 import 'budget_slider.dart';
 import 'recipedetails.dart';
 import 'recipelist.dart';
 
-const _charcoal = Color(0xFF2C2C2C);
 const _walnut = Color(0xFF8B5A2B);
-const _white = Colors.white;
-const _grey = Color(0xFF9E9E9E);
 
 const _categories = [
   'All',
@@ -159,16 +157,16 @@ class _HomePageState extends State<HomePage> {
               children: [
                 Text(
                   'Hello, $displayName',
-                  style: const TextStyle(
-                    color: _white,
+                  style: TextStyle(
+                    color: AppColors.of(context).onSurface,
                     fontSize: 24,
                     fontWeight: FontWeight.w700,
                   ),
                 ),
                 const SizedBox(height: 3),
-                const Text(
+                Text(
                   'What are you cooking today?',
-                  style: TextStyle(color: _grey, fontSize: 13),
+                  style: TextStyle(color: AppColors.of(context).subtext, fontSize: 13),
                 ),
               ],
             ),
@@ -184,10 +182,10 @@ class _HomePageState extends State<HomePage> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                const Text(
+                Text(
                   'Current Limit',
                   style: TextStyle(
-                      color: _grey, fontSize: 10, letterSpacing: 0.3),
+                      color: AppColors.of(context).subtext, fontSize: 10, letterSpacing: 0.3),
                 ),
                 const SizedBox(height: 2),
                 Text(
@@ -213,9 +211,9 @@ class _HomePageState extends State<HomePage> {
       margin: const EdgeInsets.fromLTRB(20, 18, 20, 0),
       padding: const EdgeInsets.fromLTRB(18, 16, 18, 14),
       decoration: BoxDecoration(
-        color: _charcoal,
+        color: AppColors.of(context).surface,
         borderRadius: BorderRadius.circular(18),
-        border: Border.all(color: const Color(0xFF3A3A3A), width: 1),
+        border: Border.all(color: AppColors.of(context).border, width: 1),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -224,10 +222,10 @@ class _HomePageState extends State<HomePage> {
             children: [
               const Icon(Icons.tune_rounded, color: _walnut, size: 16),
               const SizedBox(width: 8),
-              const Text(
+              Text(
                 'Budget Control',
                 style: TextStyle(
-                    color: _white,
+                    color: AppColors.of(context).onSurface,
                     fontSize: 14,
                     fontWeight: FontWeight.w600),
               ),
@@ -246,8 +244,8 @@ class _HomePageState extends State<HomePage> {
           const SizedBox(height: 6),
           Row(
             children: [
-              const Text('₱1',
-                  style: TextStyle(color: _grey, fontSize: 11)),
+              Text('₱1',
+                  style: TextStyle(color: AppColors.of(context).subtext, fontSize: 11)),
               Expanded(
                 child: BudgetSlider(
                   value: _budget,
@@ -256,15 +254,15 @@ class _HomePageState extends State<HomePage> {
                   onChanged: (v) => setState(() => _budget = v),
                 ),
               ),
-              const Text('₱500',
-                  style: TextStyle(color: _grey, fontSize: 11)),
+              Text('₱500',
+                  style: TextStyle(color: AppColors.of(context).subtext, fontSize: 11)),
             ],
           ),
           Center(
             child: Text(
               'Showing meals under ₱${_budget.toStringAsFixed(0)}',
-              style: const TextStyle(
-                color: _grey,
+              style: TextStyle(
+                color: AppColors.of(context).subtext,
                 fontSize: 12,
                 fontStyle: FontStyle.italic,
               ),
@@ -297,17 +295,17 @@ class _HomePageState extends State<HomePage> {
                 padding: const EdgeInsets.symmetric(
                     horizontal: 14, vertical: 8),
                 decoration: BoxDecoration(
-                  color: selected ? _walnut : _charcoal,
+                  color: selected ? _walnut : AppColors.of(context).surface,
                   borderRadius: BorderRadius.circular(20),
                   border: Border.all(
                     color:
-                        selected ? _walnut : const Color(0xFF3A3A3A),
+                        selected ? _walnut : AppColors.of(context).border,
                   ),
                 ),
                 child: Text(
                   cat,
                   style: TextStyle(
-                    color: selected ? _white : _grey,
+                    color: selected ? Colors.white : AppColors.of(context).subtext,
                     fontSize: 12.5,
                     fontWeight: selected
                         ? FontWeight.w600
@@ -330,10 +328,10 @@ class _HomePageState extends State<HomePage> {
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.end,
         children: [
-          const Text(
+          Text(
             'Recipes for you',
             style: TextStyle(
-              color: _white,
+              color: AppColors.of(context).onSurface,
               fontSize: 17,
               fontWeight: FontWeight.w700,
             ),
@@ -363,25 +361,25 @@ class _HomePageState extends State<HomePage> {
   // ── Empty state ────────────────────────────────────────────────────────────
 
   Widget _buildEmptyState() {
-    return const Padding(
-      padding: EdgeInsets.symmetric(vertical: 60),
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 60),
       child: Center(
         child: Column(
           children: [
-            Icon(Icons.search_off_rounded, color: _walnut, size: 56),
-            SizedBox(height: 16),
+            const Icon(Icons.search_off_rounded, color: _walnut, size: 56),
+            const SizedBox(height: 16),
             Text(
               'No recipes in this range',
               style: TextStyle(
-                  color: _white,
+                  color: AppColors.of(context).onSurface,
                   fontSize: 16,
                   fontWeight: FontWeight.w600),
             ),
-            SizedBox(height: 6),
+            const SizedBox(height: 6),
             Text(
               'Try raising your budget or\nchanging the category.',
               textAlign: TextAlign.center,
-              style: TextStyle(color: _grey, fontSize: 13, height: 1.5),
+              style: TextStyle(color: AppColors.of(context).subtext, fontSize: 13, height: 1.5),
             ),
           ],
         ),

@@ -1,11 +1,9 @@
 import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import '../mainscaffhold.dart';
+import '../theme/app_theme.dart';
 
-const _black = Color(0xFF1A1A1A);
 const _walnut = Color(0xFF8B5A2B);
-const _white = Colors.white;
-const _grey = Color(0xFF9E9E9E);
 
 class LoadingScreen extends StatefulWidget {
   const LoadingScreen({super.key});
@@ -109,7 +107,7 @@ class _LoadingScreenState extends State<LoadingScreen>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: _black,
+      backgroundColor: AppColors.of(context).background,
       body: Stack(
         fit: StackFit.expand,
         children: [
@@ -163,8 +161,8 @@ class _LoadingScreenState extends State<LoadingScreen>
                     Text(
                       'Preparing your kitchen...',
                       textAlign: TextAlign.center,
-                      style: TextStyle(
-                        color: _grey,
+                      style: const TextStyle(
+                        color: Color(0xFF9E9E9E),
                         fontSize: 13,
                         letterSpacing: 0.5,
                       ),
@@ -287,8 +285,8 @@ class _BrandingContent extends StatelessWidget {
         const SizedBox(height: 22),
         const Text(
           'Savr',
-          style: TextStyle(
-            color: _white,
+          style: const TextStyle(
+            color: Colors.white,
             fontSize: 44,
             fontWeight: FontWeight.w800,
             letterSpacing: 4,

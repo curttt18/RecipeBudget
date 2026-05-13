@@ -67,6 +67,39 @@ class AuthService {
     }
   }
 
+  static Future<String?> verifyCurrentPassword(String password) async {
+    final user = _auth.currentUser;
+    if (user == null || user.email == null) return 'No authenticated user found.';
+    try {
+      final cred = EmailAuthProvider.credential(
+          email: user.email!, password: password);
+      await user.reauthenticateWithCredential(cred);
+      return null;
+    } on FirebaseAuthException catch (e) {
+      if (e.code == 'wrong-password' || e.code == 'invalid-credential') {
+        return 'Current password is incorrect.';
+      }
+      return e.message ?? 'Verification failed.';
+    } catch (_) {
+      return 'Something went wrong. Please try again.';
+    }
+  }
+
+  static Future<String?> applyNewPassword(String newPassword) async {
+    try {
+      await _auth.currentUser?.updatePassword(newPassword);
+      await DatabaseService.updateUserPassword(newPassword);
+      return null;
+    } on FirebaseAuthException catch (e) {
+      if (e.code == 'weak-password') {
+        return 'Password must be at least 6 characters.';
+      }
+      return e.message ?? 'Failed to update password.';
+    } catch (_) {
+      return 'Something went wrong. Please try again.';
+    }
+  }
+
   static Future<String?> resetPassword(String email) async {
     try {
       await _auth.sendPasswordResetEmail(email: email.trim());

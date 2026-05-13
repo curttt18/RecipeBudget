@@ -10,23 +10,23 @@ import 'screens/register.dart';
 import 'screens/meal_plan.dart';
 import 'screens/settings.dart';
 import 'services/database.dart';
+import 'theme/app_theme.dart';
 
 class SavrApp extends StatelessWidget {
   const SavrApp({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Savr',
-      debugShowCheckedModeBanner: false,
-      theme: ThemeData(
-        scaffoldBackgroundColor: const Color(0xFF1A1A1A),
-        colorScheme: ColorScheme.fromSeed(
-          seedColor: const Color(0xFF8B5A2B),
-          brightness: Brightness.dark,
-        ),
+    return ValueListenableBuilder<ThemeMode>(
+      valueListenable: themeModeNotifier,
+      builder: (ctx, mode, _) => MaterialApp(
+        title: 'Savr',
+        debugShowCheckedModeBanner: false,
+        theme: buildLightTheme(),
+        darkTheme: buildDarkTheme(),
+        themeMode: mode,
+        home: const RegisterPage(),
       ),
-      home: const RegisterPage(),
     );
   }
 }
@@ -47,10 +47,11 @@ class _MainScaffoldState extends State<MainScaffold> {
 
   @override
   Widget build(BuildContext context) {
+    final c = AppColors.of(context);
     return Scaffold(
-      backgroundColor: const Color(0xFF1A1A1A),
+      backgroundColor: c.background,
       appBar: AppBar(
-        backgroundColor: const Color(0xFF2C2C2C),
+        backgroundColor: c.surface,
         elevation: 0,
         leading: Builder(
           builder: (ctx) => IconButton(
@@ -60,8 +61,8 @@ class _MainScaffoldState extends State<MainScaffold> {
         ),
         title: Text(
           _titles[_currentIndex],
-          style: const TextStyle(
-            color: Colors.white,
+          style: TextStyle(
+            color: c.onSurface,
             fontWeight: FontWeight.w800,
             letterSpacing: 3,
             fontSize: 20,
@@ -75,19 +76,19 @@ class _MainScaffoldState extends State<MainScaffold> {
               context,
               MaterialPageRoute(
                 builder: (_) => Scaffold(
-                  backgroundColor: const Color(0xFF1A1A1A),
+                  backgroundColor: c.background,
                   appBar: AppBar(
-                    backgroundColor: const Color(0xFF2C2C2C),
+                    backgroundColor: c.surface,
                     elevation: 0,
                     leading: IconButton(
                       icon: const Icon(Icons.arrow_back_ios_rounded,
                           color: Color(0xFF8B5A2B), size: 20),
                       onPressed: () => Navigator.pop(context),
                     ),
-                    title: const Text(
+                    title: Text(
                       'Settings',
                       style: TextStyle(
-                        color: Colors.white,
+                        color: c.onSurface,
                         fontWeight: FontWeight.w800,
                         letterSpacing: 3,
                         fontSize: 20,
@@ -97,7 +98,7 @@ class _MainScaffoldState extends State<MainScaffold> {
                     bottom: PreferredSize(
                       preferredSize: const Size.fromHeight(1),
                       child: Container(
-                          height: 1, color: const Color(0xFF3A3A3A)),
+                          height: 1, color: c.border),
                     ),
                   ),
                   body: const SettingsPage(),
@@ -125,15 +126,15 @@ class _MainScaffoldState extends State<MainScaffold> {
         ],
       ),
       bottomNavigationBar: Container(
-        decoration: const BoxDecoration(
-          border: Border(top: BorderSide(color: Color(0xFF333333), width: 0.5)),
+        decoration: BoxDecoration(
+          border: Border(top: BorderSide(color: c.divider, width: 0.5)),
         ),
         child: BottomNavigationBar(
           currentIndex: _currentIndex,
           onTap: (i) => setState(() => _currentIndex = i),
-          backgroundColor: const Color(0xFF242424),
+          backgroundColor: c.surfaceVariant,
           selectedItemColor: const Color(0xFF8B5A2B),
-          unselectedItemColor: const Color(0xFF9E9E9E),
+          unselectedItemColor: c.subtext,
           type: BottomNavigationBarType.fixed,
           selectedFontSize: 11,
           unselectedFontSize: 11,
@@ -172,12 +173,13 @@ class _SavrDrawer extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final c = AppColors.of(context);
     return Drawer(
-      backgroundColor: const Color(0xFF2B1A0A),
+      backgroundColor: c.drawerBg,
       child: Column(
         children: [
-          _buildHeader(),
-          _buildProfile(),
+          _buildHeader(c),
+          _buildProfile(c),
           const _WoodDivider(),
           _NavItem(
             icon: Icons.home_rounded,
@@ -217,29 +219,28 @@ class _SavrDrawer extends StatelessWidget {
     );
   }
 
-  Widget _buildHeader() {
+  Widget _buildHeader(AppColors c) {
     return SizedBox(
       height: 210,
       child: Stack(
         fit: StackFit.expand,
         children: [
           Image.asset('assets/sidebarlogo.jpg', fit: BoxFit.cover),
-          // Gradient fades image into the wood background at the bottom
           Container(
-            decoration: const BoxDecoration(
+            decoration: BoxDecoration(
               gradient: LinearGradient(
                 begin: Alignment.topCenter,
                 end: Alignment.bottomCenter,
                 colors: [
-                  Color(0x202B1A0A),
-                  Color(0xBB2B1A0A),
-                  Color(0xFF2B1A0A),
+                  c.drawerBg.withValues(alpha: 0.13),
+                  c.drawerBg.withValues(alpha: 0.73),
+                  c.drawerBg,
                 ],
-                stops: [0.0, 0.62, 1.0],
+                stops: const [0.0, 0.62, 1.0],
               ),
             ),
           ),
-          const Positioned(
+          Positioned(
             bottom: 16,
             left: 20,
             child: Column(
@@ -249,14 +250,14 @@ class _SavrDrawer extends StatelessWidget {
                 Text(
                   'Savr',
                   style: TextStyle(
-                    color: Color(0xFFF0DEC8),
+                    color: c.drawerText,
                     fontSize: 28,
                     fontWeight: FontWeight.w800,
                     letterSpacing: 3,
                   ),
                 ),
-                SizedBox(height: 2),
-                Text(
+                const SizedBox(height: 2),
+                const Text(
                   'Cut costs, not flavor.',
                   style: TextStyle(
                     color: Color(0xFF8B5A2B),
@@ -272,14 +273,14 @@ class _SavrDrawer extends StatelessWidget {
     );
   }
 
-  Widget _buildProfile() {
+  Widget _buildProfile(AppColors c) {
     return Container(
       margin: const EdgeInsets.fromLTRB(16, 12, 16, 8),
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
-        color: const Color(0xFF3A2410),
+        color: c.drawerCard,
         borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: const Color(0xFF5A3515), width: 0.8),
+        border: Border.all(color: c.drawerCardBorder, width: 0.8),
       ),
       child: Row(
         children: [
@@ -303,23 +304,23 @@ class _SavrDrawer extends StatelessWidget {
             ),
           ),
           const SizedBox(width: 12),
-          const Expanded(
+          Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
                   'Jacob',
                   style: TextStyle(
-                    color: Color(0xFFF0DEC8),
+                    color: c.drawerText,
                     fontSize: 15,
                     fontWeight: FontWeight.w600,
                   ),
                 ),
-                SizedBox(height: 3),
+                const SizedBox(height: 3),
                 Text(
                   'Budget: ₱20.00 / meal',
                   style: TextStyle(
-                    color: Color(0xFFB09070),
+                    color: c.drawerNavNormal,
                     fontSize: 11.5,
                   ),
                 ),
@@ -358,26 +359,27 @@ class _NavItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final c = AppColors.of(context);
     final color = isDestructive
         ? const Color(0xFFE57373)
         : selected
-            ? const Color(0xFFCE9B6E)
-            : const Color(0xFFB09070);
+            ? c.drawerNavSelected
+            : c.drawerNavNormal;
 
     return Material(
       color: Colors.transparent,
       child: InkWell(
         onTap: onTap,
-        splashColor: const Color(0x225A3515),
-        highlightColor: const Color(0x115A3515),
+        splashColor: c.accent.withValues(alpha: 0.13),
+        highlightColor: c.accent.withValues(alpha: 0.07),
         child: Container(
           padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 13),
           decoration: selected
-              ? const BoxDecoration(
-                  border: Border(
+              ? BoxDecoration(
+                  border: const Border(
                     left: BorderSide(color: Color(0xFF8B5A2B), width: 3),
                   ),
-                  color: Color(0x1E5A3515),
+                  color: c.accent.withValues(alpha: 0.12),
                 )
               : null,
           child: Row(
@@ -405,8 +407,8 @@ class _WoodDivider extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const Divider(
-      color: Color(0xFF4A2810),
+    return Divider(
+      color: AppColors.of(context).drawerDivider,
       thickness: 1,
       indent: 20,
       endIndent: 20,
@@ -469,38 +471,45 @@ class _RecipeBrowserPageState extends State<_RecipeBrowserPage> {
   void _showFilterSheet() {
     showModalBottomSheet(
       context: context,
-      backgroundColor: const Color(0xFF1E1E1E),
+      backgroundColor: Colors.transparent,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
       ),
-      builder: (_) => StatefulBuilder(
-        builder: (_, setSheetState) => Padding(
-          padding: const EdgeInsets.fromLTRB(24, 16, 24, 32),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Center(
-                child: Container(
-                  width: 40,
-                  height: 4,
-                  decoration: BoxDecoration(
-                    color: const Color(0xFF444444),
-                    borderRadius: BorderRadius.circular(2),
-                  ),
-                ),
+      builder: (_) => Builder(
+        builder: (sheetCtx) {
+          final c = AppColors.of(sheetCtx);
+          return StatefulBuilder(
+            builder: (_, setSheetState) => Container(
+              padding: const EdgeInsets.fromLTRB(24, 16, 24, 32),
+              decoration: BoxDecoration(
+                color: c.modal,
+                borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
               ),
-              const SizedBox(height: 20),
-              Row(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text(
-                    'Filter Recipes',
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 17,
-                      fontWeight: FontWeight.w700,
+                  Center(
+                    child: Container(
+                      width: 40,
+                      height: 4,
+                      decoration: BoxDecoration(
+                        color: c.border,
+                        borderRadius: BorderRadius.circular(2),
+                      ),
                     ),
                   ),
+                  const SizedBox(height: 20),
+                  Row(
+                    children: [
+                      Text(
+                        'Filter Recipes',
+                        style: TextStyle(
+                          color: c.onSurface,
+                          fontSize: 17,
+                          fontWeight: FontWeight.w700,
+                        ),
+                      ),
                   const Spacer(),
                   if (_selectedCategory != null)
                     GestureDetector(
@@ -552,12 +561,12 @@ class _RecipeBrowserPageState extends State<_RecipeBrowserPage> {
                               decoration: BoxDecoration(
                                 color: active
                                     ? const Color(0xFF8B5A2B)
-                                    : const Color(0xFF2C2C2C),
+                                    : c.surface,
                                 borderRadius: BorderRadius.circular(20),
                                 border: Border.all(
                                   color: active
                                       ? const Color(0xFF8B5A2B)
-                                      : const Color(0xFF3A3A3A),
+                                      : c.border,
                                   width: 1,
                                 ),
                               ),
@@ -566,7 +575,7 @@ class _RecipeBrowserPageState extends State<_RecipeBrowserPage> {
                                 style: TextStyle(
                                   color: active
                                       ? Colors.white
-                                      : const Color(0xFF9E9E9E),
+                                      : c.subtext,
                                   fontSize: 13,
                                   fontWeight: active
                                       ? FontWeight.w600
@@ -580,9 +589,11 @@ class _RecipeBrowserPageState extends State<_RecipeBrowserPage> {
                       const SizedBox(height: 20),
                     ],
                   )),
-            ],
-          ),
-        ),
+                ],
+              ),
+            ),
+          );
+        },
       ),
     );
   }
@@ -614,23 +625,23 @@ class _RecipeBrowserPageState extends State<_RecipeBrowserPage> {
                     Expanded(
                       child: TextField(
                         onChanged: (v) => setState(() => _searchQuery = v),
-                        style: const TextStyle(color: Colors.white, fontSize: 14),
+                        style: TextStyle(color: AppColors.of(context).onSurface, fontSize: 14),
                         decoration: InputDecoration(
                           hintText: 'Search recipes...',
-                          hintStyle: const TextStyle(
-                              color: Color(0xFF9E9E9E), fontSize: 14),
+                          hintStyle: TextStyle(
+                              color: AppColors.of(context).subtext, fontSize: 14),
                           prefixIcon: const Icon(Icons.search_rounded,
                               color: Color(0xFF8B5A2B), size: 20),
                           filled: true,
-                          fillColor: const Color(0xFF2C2C2C),
+                          fillColor: AppColors.of(context).surface,
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(12),
                             borderSide: BorderSide.none,
                           ),
                           enabledBorder: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(12),
-                            borderSide: const BorderSide(
-                                color: Color(0xFF3A3A3A), width: 1),
+                            borderSide: BorderSide(
+                                color: AppColors.of(context).border, width: 1),
                           ),
                           focusedBorder: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(12),
@@ -653,12 +664,12 @@ class _RecipeBrowserPageState extends State<_RecipeBrowserPage> {
                             decoration: BoxDecoration(
                               color: _selectedCategory != null
                                   ? const Color(0xFF8B5A2B)
-                                  : const Color(0xFF2C2C2C),
+                                  : AppColors.of(context).surface,
                               borderRadius: BorderRadius.circular(12),
                               border: Border.all(
                                 color: _selectedCategory != null
                                     ? const Color(0xFF8B5A2B)
-                                    : const Color(0xFF3A3A3A),
+                                    : AppColors.of(context).border,
                                 width: 1,
                               ),
                             ),
@@ -666,7 +677,7 @@ class _RecipeBrowserPageState extends State<_RecipeBrowserPage> {
                               Icons.tune_rounded,
                               color: _selectedCategory != null
                                   ? Colors.white
-                                  : const Color(0xFF9E9E9E),
+                                  : AppColors.of(context).subtext,
                               size: 20,
                             ),
                           ),
@@ -740,8 +751,8 @@ class _RecipeBrowserPageState extends State<_RecipeBrowserPage> {
                   children: [
                     Text(
                       _selectedCategory ?? 'All Recipes',
-                      style: const TextStyle(
-                        color: Colors.white,
+                      style: TextStyle(
+                        color: AppColors.of(context).onSurface,
                         fontSize: 17,
                         fontWeight: FontWeight.w700,
                       ),
@@ -789,8 +800,8 @@ class _RecipeBrowserPageState extends State<_RecipeBrowserPage> {
                   child: Center(
                     child: Column(
                       children: [
-                        const Icon(Icons.search_off_rounded,
-                            color: Color(0xFF555555), size: 48),
+                        Icon(Icons.search_off_rounded,
+                            color: AppColors.of(context).border, size: 48),
                         const SizedBox(height: 12),
                         Text(
                           _selectedCategory != null
@@ -798,8 +809,8 @@ class _RecipeBrowserPageState extends State<_RecipeBrowserPage> {
                               : _searchQuery.isEmpty
                                   ? 'No recipes found.'
                                   : 'No results for "$_searchQuery".',
-                          style: const TextStyle(
-                              color: Color(0xFF9E9E9E), fontSize: 14),
+                          style: TextStyle(
+                              color: AppColors.of(context).subtext, fontSize: 14),
                         ),
                       ],
                     ),

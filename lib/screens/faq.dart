@@ -1,12 +1,8 @@
 import 'package:flutter/material.dart';
+import '../theme/app_theme.dart';
 
-const _black = Color(0xFF1A1A1A);
-const _charcoal = Color(0xFF2C2C2C);
 const _walnut = Color(0xFF8B5A2B);
 const _walnutLight = Color(0xFFAD7244);
-const _white = Colors.white;
-const _grey = Color(0xFF9E9E9E);
-const _greyDark = Color(0xFF3A3A3A);
 
 // ── Data ──────────────────────────────────────────────────────────────────────
 
@@ -110,18 +106,18 @@ class FaqPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: _black,
+      backgroundColor: AppColors.of(context).background,
       appBar: AppBar(
-        backgroundColor: _charcoal,
+        backgroundColor: AppColors.of(context).surface,
         elevation: 0,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back_ios_rounded, color: _walnut, size: 20),
           onPressed: () => Navigator.pop(context),
         ),
-        title: const Text(
+        title: Text(
           'Help & FAQ',
           style: TextStyle(
-            color: _white,
+            color: AppColors.of(context).onSurface,
             fontWeight: FontWeight.w700,
             fontSize: 18,
             letterSpacing: 1,
@@ -130,7 +126,7 @@ class FaqPage extends StatelessWidget {
         centerTitle: true,
         bottom: PreferredSize(
           preferredSize: const Size.fromHeight(1),
-          child: Container(height: 1, color: _greyDark),
+          child: Container(height: 1, color: AppColors.of(context).border),
         ),
       ),
       body: ListView.separated(
@@ -161,9 +157,9 @@ class _SectionBlock extends StatelessWidget {
               width: 32,
               height: 32,
               decoration: BoxDecoration(
-                color: const Color(0xFF261508),
+                color: AppColors.of(context).chipBg,
                 borderRadius: BorderRadius.circular(9),
-                border: Border.all(color: const Color(0xFF4A3020), width: 1),
+                border: Border.all(color: AppColors.of(context).chipBorder, width: 1),
               ),
               child: Icon(section.icon, color: _walnut, size: 16),
             ),
@@ -182,9 +178,9 @@ class _SectionBlock extends StatelessWidget {
         const SizedBox(height: 12),
         Container(
           decoration: BoxDecoration(
-            color: _charcoal,
+            color: AppColors.of(context).surface,
             borderRadius: BorderRadius.circular(16),
-            border: Border.all(color: _greyDark, width: 1),
+            border: Border.all(color: AppColors.of(context).border, width: 1),
           ),
           child: Column(
             children: section.items
@@ -195,9 +191,9 @@ class _SectionBlock extends StatelessWidget {
                     children: [
                       _FaqTile(item: e.value),
                       if (e.key < section.items.length - 1)
-                        const Divider(
+                        Divider(
                           height: 1,
-                          color: Color(0xFF333333),
+                          color: AppColors.of(context).divider,
                           indent: 16,
                           endIndent: 16,
                         ),
@@ -267,7 +263,7 @@ class _FaqTileState extends State<_FaqTile>
                   child: Text(
                     widget.item.question,
                     style: TextStyle(
-                      color: _expanded ? _walnutLight : _white,
+                      color: _expanded ? _walnutLight : AppColors.of(context).onSurface,
                       fontSize: 13.5,
                       fontWeight: FontWeight.w600,
                       height: 1.4,
@@ -281,7 +277,7 @@ class _FaqTileState extends State<_FaqTile>
                   curve: Curves.easeInOut,
                   child: Icon(
                     Icons.chevron_right_rounded,
-                    color: _expanded ? _walnut : _grey,
+                    color: _expanded ? _walnut : AppColors.of(context).subtext,
                     size: 22,
                   ),
                 ),
@@ -295,8 +291,8 @@ class _FaqTileState extends State<_FaqTile>
                   padding: const EdgeInsets.only(top: 10, right: 30),
                   child: Text(
                     widget.item.answer,
-                    style: const TextStyle(
-                      color: _grey,
+                    style: TextStyle(
+                      color: AppColors.of(context).subtext,
                       fontSize: 13,
                       height: 1.65,
                     ),

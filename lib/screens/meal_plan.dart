@@ -4,13 +4,9 @@ import 'package:flutter/material.dart';
 import '../model/meal_plan_model.dart';
 import '../model/recipe_model.dart';
 import '../services/database.dart';
+import '../theme/app_theme.dart';
 
-const _charcoal = Color(0xFF2C2C2C);
 const _walnut = Color(0xFF8B5A2B);
-const _walnutLight = Color(0xFFAD7244);
-const _white = Colors.white;
-const _grey = Color(0xFF9E9E9E);
-const _greyDark = Color(0xFF3A3A3A);
 
 String _fmtDate(DateTime d) {
   const months = [
@@ -84,9 +80,9 @@ class _MealPlanPageState extends State<MealPlanPage> {
       );
     }
     if (_userId == null) {
-      return const Center(
+      return Center(
         child: Text('Unable to load user. Please log out and sign in again.',
-            style: TextStyle(color: _grey, fontSize: 13),
+            style: TextStyle(color: AppColors.of(context).subtext, fontSize: 13),
             textAlign: TextAlign.center),
       );
     }
@@ -107,7 +103,7 @@ class _MealPlanPageState extends State<MealPlanPage> {
                   padding: const EdgeInsets.all(32),
                   child: Text(
                     'Failed to load meal plans.\n${snap.error}',
-                    style: const TextStyle(color: _grey, fontSize: 13),
+                    style: TextStyle(color: AppColors.of(context).subtext, fontSize: 13),
                     textAlign: TextAlign.center,
                   ),
                 ),
@@ -133,7 +129,7 @@ class _MealPlanPageState extends State<MealPlanPage> {
           right: 20,
           child: FloatingActionButton(
             backgroundColor: _walnut,
-            foregroundColor: _white,
+            foregroundColor: Colors.white,
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(16),
             ),
@@ -154,9 +150,9 @@ class _MealPlanPageState extends State<MealPlanPage> {
             width: 80,
             height: 80,
             decoration: BoxDecoration(
-              color: const Color(0xFF261508),
+              color: AppColors.of(context).chipBg,
               shape: BoxShape.circle,
-              border: Border.all(color: const Color(0xFF4A3020), width: 1.5),
+              border: Border.all(color: AppColors.of(context).chipBorder, width: 1.5),
             ),
             child: const Icon(
               Icons.calendar_month_rounded,
@@ -165,18 +161,18 @@ class _MealPlanPageState extends State<MealPlanPage> {
             ),
           ),
           const SizedBox(height: 20),
-          const Text(
+          Text(
             'No meal plans yet',
             style: TextStyle(
-              color: _white,
+              color: AppColors.of(context).onSurface,
               fontSize: 17,
               fontWeight: FontWeight.w700,
             ),
           ),
           const SizedBox(height: 6),
-          const Text(
+          Text(
             'Tap + to schedule your first meal plan',
-            style: TextStyle(color: _grey, fontSize: 13),
+            style: TextStyle(color: AppColors.of(context).subtext, fontSize: 13),
           ),
         ],
       ),
@@ -206,9 +202,9 @@ class _MealPlanCard extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: _charcoal,
+        color: AppColors.of(context).surface,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: _greyDark, width: 1),
+        border: Border.all(color: AppColors.of(context).border, width: 1),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -220,9 +216,9 @@ class _MealPlanCard extends StatelessWidget {
                 padding:
                     const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
                 decoration: BoxDecoration(
-                  color: const Color(0xFF261508),
+                  color: AppColors.of(context).chipBg,
                   borderRadius: BorderRadius.circular(8),
-                  border: Border.all(color: const Color(0xFF4A3020)),
+                  border: Border.all(color: AppColors.of(context).chipBorder),
                 ),
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
@@ -232,8 +228,8 @@ class _MealPlanCard extends StatelessWidget {
                     const SizedBox(width: 5),
                     Text(
                       _fmtDate(plan.schedule),
-                      style: const TextStyle(
-                        color: _walnutLight,
+                      style: TextStyle(
+                        color: AppColors.of(context).accentLight,
                         fontSize: 11,
                         fontWeight: FontWeight.w600,
                       ),
@@ -248,11 +244,11 @@ class _MealPlanCard extends StatelessWidget {
                   width: 32,
                   height: 32,
                   decoration: BoxDecoration(
-                    color: const Color(0xFF1A1A1A),
+                    color: AppColors.of(context).background,
                     borderRadius: BorderRadius.circular(8),
                   ),
-                  child: const Icon(Icons.delete_outline_rounded,
-                      color: _grey, size: 17),
+                  child: Icon(Icons.delete_outline_rounded,
+                      color: AppColors.of(context).subtext, size: 17),
                 ),
               ),
             ],
@@ -262,8 +258,8 @@ class _MealPlanCard extends StatelessWidget {
           // ── Plan name ───────────────────────────────────────────────────
           Text(
             plan.planName,
-            style: const TextStyle(
-              color: _white,
+            style: TextStyle(
+              color: AppColors.of(context).onSurface,
               fontSize: 15,
               fontWeight: FontWeight.w700,
             ),
@@ -276,8 +272,8 @@ class _MealPlanCard extends StatelessWidget {
               plan.planDetails,
               maxLines: 2,
               overflow: TextOverflow.ellipsis,
-              style: const TextStyle(
-                color: _grey,
+              style: TextStyle(
+                color: AppColors.of(context).subtext,
                 fontSize: 12.5,
                 height: 1.5,
               ),
@@ -291,7 +287,7 @@ class _MealPlanCard extends StatelessWidget {
               padding:
                   const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
               decoration: BoxDecoration(
-                color: const Color(0xFF1A1A1A),
+                color: AppColors.of(context).background,
                 borderRadius: BorderRadius.circular(8),
               ),
               child: Row(
@@ -303,7 +299,7 @@ class _MealPlanCard extends StatelessWidget {
                       plan.notes,
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
-                      style: const TextStyle(color: _grey, fontSize: 12),
+                      style: TextStyle(color: AppColors.of(context).subtext, fontSize: 12),
                     ),
                   ),
                 ],
@@ -314,7 +310,7 @@ class _MealPlanCard extends StatelessWidget {
           // ── Linked recipes ──────────────────────────────────────────────
           if (linked.isNotEmpty || plan.recipeIds.isNotEmpty) ...[
             const SizedBox(height: 10),
-            const Divider(height: 1, color: Color(0xFF333333)),
+            Divider(height: 1, color: AppColors.of(context).divider),
             const SizedBox(height: 10),
             Row(
               children: [
@@ -328,8 +324,8 @@ class _MealPlanCard extends StatelessWidget {
                         : '${plan.recipeIds.length} recipe${plan.recipeIds.length == 1 ? '' : 's'}',
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
-                    style: const TextStyle(
-                      color: _walnutLight,
+                    style: TextStyle(
+                      color: AppColors.of(context).accentLight,
                       fontSize: 12,
                     ),
                   ),
@@ -346,22 +342,22 @@ class _MealPlanCard extends StatelessWidget {
     showDialog(
       context: context,
       builder: (_) => AlertDialog(
-        backgroundColor: _charcoal,
+        backgroundColor: AppColors.of(context).surface,
         shape:
             RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-        title: const Text(
+        title: Text(
           'Delete Plan',
           style: TextStyle(
-              color: _white, fontSize: 16, fontWeight: FontWeight.w700),
+              color: AppColors.of(context).onSurface, fontSize: 16, fontWeight: FontWeight.w700),
         ),
         content: Text(
           'Are you sure you want to delete "${plan.planName}"? This cannot be undone.',
-          style: const TextStyle(color: _grey, fontSize: 13, height: 1.5),
+          style: TextStyle(color: AppColors.of(context).subtext, fontSize: 13, height: 1.5),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: const Text('Cancel', style: TextStyle(color: _grey)),
+            child: Text('Cancel', style: TextStyle(color: AppColors.of(context).subtext)),
           ),
           TextButton(
             onPressed: () {
@@ -420,9 +416,9 @@ class _CreatePlanSheetState extends State<_CreatePlanSheet> {
         data: ThemeData.dark().copyWith(
           colorScheme: const ColorScheme.dark(
             primary: _walnut,
-            onPrimary: _white,
-            surface: _charcoal,
-            onSurface: _white,
+            onPrimary: Colors.white,
+            surface: Color(0xFF2C2C2C),
+            onSurface: Colors.white,
           ),
         ),
         child: child!,
@@ -459,9 +455,9 @@ class _CreatePlanSheetState extends State<_CreatePlanSheet> {
       maxChildSize: 0.95,
       expand: false,
       builder: (ctx, scrollCtrl) => Container(
-        decoration: const BoxDecoration(
-          color: Color(0xFF1E1E1E),
-          borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+        decoration: BoxDecoration(
+          color: AppColors.of(ctx).modal,
+          borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
         ),
         child: Column(
           children: [
@@ -477,26 +473,26 @@ class _CreatePlanSheetState extends State<_CreatePlanSheet> {
                       height: 4,
                       margin: const EdgeInsets.only(bottom: 18),
                       decoration: BoxDecoration(
-                        color: _greyDark,
+                        color: AppColors.of(ctx).border,
                         borderRadius: BorderRadius.circular(2),
                       ),
                     ),
                   ),
-                  const Text(
+                  Text(
                     'New Meal Plan',
                     style: TextStyle(
-                      color: _white,
+                      color: AppColors.of(ctx).onSurface,
                       fontSize: 18,
                       fontWeight: FontWeight.w700,
                     ),
                   ),
                   const SizedBox(height: 4),
-                  const Text(
+                  Text(
                     'Fill in the details to schedule your meal',
-                    style: TextStyle(color: _grey, fontSize: 13),
+                    style: TextStyle(color: AppColors.of(ctx).subtext, fontSize: 13),
                   ),
                   const SizedBox(height: 16),
-                  const Divider(height: 1, color: Color(0xFF2E2E2E)),
+                  Divider(height: 1, color: AppColors.of(ctx).divider),
                 ],
               ),
             ),
@@ -528,9 +524,9 @@ class _CreatePlanSheetState extends State<_CreatePlanSheet> {
                       padding: const EdgeInsets.symmetric(
                           horizontal: 14, vertical: 14),
                       decoration: BoxDecoration(
-                        color: _charcoal,
+                        color: AppColors.of(ctx).surface,
                         borderRadius: BorderRadius.circular(12),
-                        border: Border.all(color: _greyDark),
+                        border: Border.all(color: AppColors.of(ctx).border),
                       ),
                       child: Row(
                         children: [
@@ -540,14 +536,14 @@ class _CreatePlanSheetState extends State<_CreatePlanSheet> {
                           Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              const Text('Schedule Date',
+                              Text('Schedule Date',
                                   style:
-                                      TextStyle(color: _grey, fontSize: 11)),
+                                      TextStyle(color: AppColors.of(ctx).subtext, fontSize: 11)),
                               const SizedBox(height: 2),
                               Text(
                                 _fmtDate(_schedule),
-                                style: const TextStyle(
-                                  color: _white,
+                                style: TextStyle(
+                                  color: AppColors.of(ctx).onSurface,
                                   fontSize: 14,
                                   fontWeight: FontWeight.w500,
                                 ),
@@ -555,8 +551,8 @@ class _CreatePlanSheetState extends State<_CreatePlanSheet> {
                             ],
                           ),
                           const Spacer(),
-                          const Icon(Icons.chevron_right_rounded,
-                              color: _grey, size: 20),
+                          Icon(Icons.chevron_right_rounded,
+                              color: AppColors.of(ctx).subtext, size: 20),
                         ],
                       ),
                     ),
@@ -591,10 +587,10 @@ class _CreatePlanSheetState extends State<_CreatePlanSheet> {
                           width: 32,
                           height: 32,
                           decoration: BoxDecoration(
-                            color: const Color(0xFF261508),
+                            color: AppColors.of(ctx).chipBg,
                             borderRadius: BorderRadius.circular(9),
                             border:
-                                Border.all(color: const Color(0xFF4A3020)),
+                                Border.all(color: AppColors.of(ctx).chipBorder),
                           ),
                           child: const Icon(
                               Icons.restaurant_menu_rounded,
@@ -617,7 +613,7 @@ class _CreatePlanSheetState extends State<_CreatePlanSheet> {
                               ? 'Optional'
                               : '${_selectedIds.length} selected',
                           style:
-                              const TextStyle(color: _grey, fontSize: 11),
+                              TextStyle(color: AppColors.of(ctx).subtext, fontSize: 11),
                         ),
                       ],
                     ),
@@ -638,16 +634,16 @@ class _CreatePlanSheetState extends State<_CreatePlanSheet> {
                             padding: const EdgeInsets.symmetric(
                                 horizontal: 12, vertical: 7),
                             decoration: BoxDecoration(
-                              color: sel ? _walnut : _charcoal,
+                              color: sel ? _walnut : AppColors.of(ctx).surface,
                               borderRadius: BorderRadius.circular(20),
                               border: Border.all(
-                                color: sel ? _walnut : _greyDark,
+                                color: sel ? _walnut : AppColors.of(ctx).border,
                               ),
                             ),
                             child: Text(
                               r.title,
                               style: TextStyle(
-                                color: sel ? _white : _grey,
+                                color: sel ? Colors.white : AppColors.of(ctx).subtext,
                                 fontSize: 12.5,
                                 fontWeight: sel
                                     ? FontWeight.w600
@@ -688,12 +684,12 @@ class _CreatePlanSheetState extends State<_CreatePlanSheet> {
                               width: 20,
                               height: 20,
                               child: CircularProgressIndicator(
-                                  color: _white, strokeWidth: 2),
+                                  color: Colors.white, strokeWidth: 2),
                             )
                           : const Text(
                               'Create Meal Plan',
                               style: TextStyle(
-                                color: _white,
+                                color: Colors.white,
                                 fontSize: 15,
                                 fontWeight: FontWeight.w600,
                               ),
@@ -732,13 +728,13 @@ class _Field extends StatelessWidget {
     return TextField(
       controller: controller,
       maxLines: maxLines,
-      style: const TextStyle(color: _white, fontSize: 14),
+      style: TextStyle(color: AppColors.of(context).onSurface, fontSize: 14),
       decoration: InputDecoration(
         labelText: label,
         hintText: hint,
         hintStyle:
-            const TextStyle(color: Color(0xFF555555), fontSize: 13),
-        labelStyle: const TextStyle(color: _grey, fontSize: 13),
+            TextStyle(color: AppColors.of(context).subtext, fontSize: 13),
+        labelStyle: TextStyle(color: AppColors.of(context).subtext, fontSize: 13),
         prefixIcon: maxLines > 1
             ? Padding(
                 padding: const EdgeInsets.only(bottom: 42),
@@ -747,14 +743,14 @@ class _Field extends StatelessWidget {
             : Icon(icon, color: _walnut, size: 20),
         alignLabelWithHint: maxLines > 1,
         filled: true,
-        fillColor: _charcoal,
+        fillColor: AppColors.of(context).surface,
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
-          borderSide: const BorderSide(color: _greyDark),
+          borderSide: BorderSide(color: AppColors.of(context).border),
         ),
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
-          borderSide: const BorderSide(color: _greyDark),
+          borderSide: BorderSide(color: AppColors.of(context).border),
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../theme/app_theme.dart';
 
 class BudgetSlider extends StatelessWidget {
   const BudgetSlider({
@@ -19,7 +20,7 @@ class BudgetSlider extends StatelessWidget {
     return SliderTheme(
       data: SliderThemeData(
         activeTrackColor: const Color(0xFF8B5A2B),
-        inactiveTrackColor: const Color(0xFF3A3A3A),
+        inactiveTrackColor: AppColors.of(context).border,
         thumbColor: const Color(0xFF8B5A2B),
         overlayColor: const Color(0x268B5A2B),
         trackHeight: 4,

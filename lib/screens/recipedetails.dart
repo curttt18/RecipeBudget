@@ -1,13 +1,9 @@
 import 'package:flutter/material.dart';
 import '../model/recipe_model.dart';
 import '../services/database.dart';
+import '../theme/app_theme.dart';
 
-const _bg = Color(0xFF1A1A1A);
-const _surface = Color(0xFF242424);
 const _walnut = Color(0xFF8B5A2B);
-const _white = Colors.white;
-const _grey = Color(0xFF9E9E9E);
-const _border = Color(0xFF333333);
 
 class RecipeDetailsPage extends StatefulWidget {
   const RecipeDetailsPage({
@@ -103,7 +99,7 @@ class _RecipeDetailsPageState extends State<RecipeDetailsPage> {
     final steps = _parseSteps(recipe.instructions);
 
     return Scaffold(
-      backgroundColor: _bg,
+      backgroundColor: AppColors.of(context).background,
       body: CustomScrollView(
         physics: const BouncingScrollPhysics(),
         slivers: [
@@ -147,7 +143,7 @@ class _RecipeDetailsPageState extends State<RecipeDetailsPage> {
     return SliverAppBar(
       expandedHeight: 290,
       pinned: true,
-      backgroundColor: const Color(0xFF2C2C2C),
+      backgroundColor: AppColors.of(context).surface,
       automaticallyImplyLeading: false,
       leading: Padding(
         padding: const EdgeInsets.all(8),
@@ -159,7 +155,7 @@ class _RecipeDetailsPageState extends State<RecipeDetailsPage> {
               shape: BoxShape.circle,
             ),
             child: const Icon(Icons.arrow_back_rounded,
-                color: _white, size: 20),
+                color: Colors.white, size: 20),
           ),
         ),
       ),
@@ -205,7 +201,7 @@ class _RecipeDetailsPageState extends State<RecipeDetailsPage> {
                     Text(
                       recipe.category,
                       style: const TextStyle(
-                        color: _white,
+                        color: Colors.white,
                         fontSize: 11,
                         fontWeight: FontWeight.w600,
                       ),
@@ -238,8 +234,8 @@ class _RecipeDetailsPageState extends State<RecipeDetailsPage> {
   Widget _buildTitleRow(RecipeModel recipe) {
     return Text(
       recipe.title,
-      style: const TextStyle(
-        color: _white,
+      style: TextStyle(
+        color: AppColors.of(context).onSurface,
         fontSize: 24,
         fontWeight: FontWeight.w800,
         height: 1.3,
@@ -251,6 +247,7 @@ class _RecipeDetailsPageState extends State<RecipeDetailsPage> {
   // ── Stat chips ─────────────────────────────────────────────────────────────
 
   Widget _buildStatsRow(RecipeModel recipe) {
+    final c = AppColors.of(context);
     return Row(
       children: [
         _StatChip(
@@ -266,8 +263,8 @@ class _RecipeDetailsPageState extends State<RecipeDetailsPage> {
             icon: Icons.timer_outlined,
             label: '${recipe.prepMinutes} min',
             sublabel: 'Cook Time',
-            iconColor: _grey,
-            accentColor: _grey,
+            iconColor: c.subtext,
+            accentColor: c.subtext,
           ),
         ],
       ],
@@ -292,8 +289,8 @@ class _RecipeDetailsPageState extends State<RecipeDetailsPage> {
         const SizedBox(width: 8),
         Text(
           title,
-          style: const TextStyle(
-            color: _white,
+          style: TextStyle(
+            color: AppColors.of(context).onSurface,
             fontSize: 17,
             fontWeight: FontWeight.w700,
           ),
@@ -308,9 +305,9 @@ class _RecipeDetailsPageState extends State<RecipeDetailsPage> {
     return Container(
       padding: const EdgeInsets.symmetric(vertical: 4),
       decoration: BoxDecoration(
-        color: _surface,
+        color: AppColors.of(context).surfaceVariant,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: _border, width: 1),
+        border: Border.all(color: AppColors.of(context).divider, width: 1),
       ),
       child: Column(
         children: ingredients.asMap().entries.map((e) {
@@ -335,8 +332,8 @@ class _RecipeDetailsPageState extends State<RecipeDetailsPage> {
                     Expanded(
                       child: Text(
                         e.value,
-                        style: const TextStyle(
-                          color: _white,
+                        style: TextStyle(
+                          color: AppColors.of(context).onSurface,
                           fontSize: 14,
                           height: 1.5,
                         ),
@@ -346,8 +343,8 @@ class _RecipeDetailsPageState extends State<RecipeDetailsPage> {
                 ),
               ),
               if (!isLast)
-                const Divider(
-                    color: Color(0xFF2E2E2E), height: 1, thickness: 0.5),
+                Divider(
+                    color: AppColors.of(context).divider, height: 1, thickness: 0.5),
             ],
           );
         }).toList(),
@@ -364,9 +361,9 @@ class _RecipeDetailsPageState extends State<RecipeDetailsPage> {
           margin: const EdgeInsets.only(bottom: 10),
           padding: const EdgeInsets.all(16),
           decoration: BoxDecoration(
-            color: _surface,
+            color: AppColors.of(context).surfaceVariant,
             borderRadius: BorderRadius.circular(16),
-            border: Border.all(color: _border, width: 1),
+            border: Border.all(color: AppColors.of(context).divider, width: 1),
           ),
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -383,7 +380,7 @@ class _RecipeDetailsPageState extends State<RecipeDetailsPage> {
                   child: Text(
                     '${e.key + 1}',
                     style: const TextStyle(
-                      color: _white,
+                      color: Colors.white,
                       fontSize: 13,
                       fontWeight: FontWeight.w700,
                     ),
@@ -393,8 +390,8 @@ class _RecipeDetailsPageState extends State<RecipeDetailsPage> {
               Expanded(
                 child: Text(
                   e.value.trim(),
-                  style: const TextStyle(
-                    color: _white,
+                  style: TextStyle(
+                    color: AppColors.of(context).onSurface,
                     fontSize: 14,
                     height: 1.6,
                   ),
@@ -420,7 +417,7 @@ class _RecipeDetailsPageState extends State<RecipeDetailsPage> {
           height: 54,
           width: double.infinity,
           decoration: BoxDecoration(
-            color: saved ? const Color(0xFF2C2C2C) : _walnut,
+            color: saved ? AppColors.of(context).surface : _walnut,
             borderRadius: BorderRadius.circular(16),
             border: Border.all(
               color: saved ? const Color(0xFFE57373) : _walnut,
@@ -441,7 +438,7 @@ class _RecipeDetailsPageState extends State<RecipeDetailsPage> {
                     width: 20,
                     height: 20,
                     child: CircularProgressIndicator(
-                        color: _white, strokeWidth: 2),
+                        color: Colors.white, strokeWidth: 2),
                   ),
                 )
               : Row(
@@ -451,14 +448,14 @@ class _RecipeDetailsPageState extends State<RecipeDetailsPage> {
                       saved
                           ? Icons.favorite_rounded
                           : Icons.favorite_border_rounded,
-                      color: saved ? const Color(0xFFE57373) : _white,
+                      color: saved ? const Color(0xFFE57373) : Colors.white,
                       size: 20,
                     ),
                     const SizedBox(width: 10),
                     Text(
                       saved ? 'Saved to Favorites' : 'Save Recipe',
                       style: TextStyle(
-                        color: saved ? const Color(0xFFE57373) : _white,
+                        color: saved ? const Color(0xFFE57373) : Colors.white,
                         fontSize: 15,
                         fontWeight: FontWeight.w700,
                         letterSpacing: 0.3,
@@ -494,9 +491,9 @@ class _StatChip extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
       decoration: BoxDecoration(
-        color: _surface,
+        color: AppColors.of(context).surfaceVariant,
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: _border, width: 1),
+        border: Border.all(color: AppColors.of(context).divider, width: 1),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
@@ -517,15 +514,15 @@ class _StatChip extends StatelessWidget {
             children: [
               Text(
                 label,
-                style: const TextStyle(
-                  color: _white,
+                style: TextStyle(
+                  color: AppColors.of(context).onSurface,
                   fontSize: 15,
                   fontWeight: FontWeight.w700,
                 ),
               ),
               Text(
                 sublabel,
-                style: const TextStyle(color: _grey, fontSize: 10),
+                style: TextStyle(color: AppColors.of(context).subtext, fontSize: 10),
               ),
             ],
           ),

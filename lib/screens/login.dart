@@ -2,14 +2,12 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import '../services/auth_service.dart';
+import '../services/database.dart';
+import '../theme/app_theme.dart';
 import 'register.dart';
 import 'loading_screen.dart';
 
-const _black = Color(0xFF1A1A1A);
-const _charcoal = Color(0xFF2C2C2C);
 const _walnut = Color(0xFF8B5A2B);
-const _white = Colors.white;
-const _grey = Color(0xFF9E9E9E);
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -93,9 +91,9 @@ class _LoginPageState extends State<LoginPage>
           padding: EdgeInsets.only(bottom: MediaQuery.of(ctx).viewInsets.bottom),
           child: Container(
             padding: const EdgeInsets.fromLTRB(24, 12, 24, 32),
-            decoration: const BoxDecoration(
-              color: Color(0xFF1E1E1E),
-              borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+            decoration: BoxDecoration(
+              color: AppColors.of(context).modal,
+              borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
             ),
             child: Column(
               mainAxisSize: MainAxisSize.min,
@@ -105,48 +103,48 @@ class _LoginPageState extends State<LoginPage>
                   height: 4,
                   margin: const EdgeInsets.only(bottom: 20),
                   decoration: BoxDecoration(
-                    color: const Color(0xFF3A3A3A),
+                    color: AppColors.of(context).border,
                     borderRadius: BorderRadius.circular(2),
                   ),
                 ),
-                const Align(
+                Align(
                   alignment: Alignment.centerLeft,
                   child: Text(
                     'Reset Password',
                     style: TextStyle(
-                      color: _white,
+                      color: AppColors.of(context).onSurface,
                       fontSize: 18,
                       fontWeight: FontWeight.w700,
                     ),
                   ),
                 ),
                 const SizedBox(height: 6),
-                const Align(
+                Align(
                   alignment: Alignment.centerLeft,
                   child: Text(
                     "Enter your email and we'll send a reset link.",
-                    style: TextStyle(color: _grey, fontSize: 13),
+                    style: TextStyle(color: AppColors.of(context).subtext, fontSize: 13),
                   ),
                 ),
                 const SizedBox(height: 24),
                 TextField(
                   controller: emailCtrl,
                   keyboardType: TextInputType.emailAddress,
-                  style: const TextStyle(color: _white, fontSize: 14),
+                  style: TextStyle(color: AppColors.of(context).onSurface, fontSize: 14),
                   decoration: InputDecoration(
                     labelText: 'Email Address',
-                    labelStyle: const TextStyle(color: _grey, fontSize: 13),
+                    labelStyle: TextStyle(color: AppColors.of(context).subtext, fontSize: 13),
                     prefixIcon: const Icon(Icons.email_outlined, color: _walnut, size: 20),
                     filled: true,
-                    fillColor: _charcoal,
+                    fillColor: AppColors.of(context).surface,
                     errorText: errorMsg,
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(12),
-                      borderSide: const BorderSide(color: Color(0xFF3A3A3A)),
+                      borderSide: BorderSide(color: AppColors.of(context).border),
                     ),
                     enabledBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(12),
-                      borderSide: const BorderSide(color: Color(0xFF3A3A3A)),
+                      borderSide: BorderSide(color: AppColors.of(context).border),
                     ),
                     focusedBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(12),
@@ -197,14 +195,14 @@ class _LoginPageState extends State<LoginPage>
                             width: 20,
                             height: 20,
                             child: CircularProgressIndicator(
-                              color: _white,
+                              color: Colors.white,
                               strokeWidth: 2,
                             ),
                           )
                         : const Text(
                             'Send Reset Link',
                             style: TextStyle(
-                              color: _white,
+                              color: Colors.white,
                               fontSize: 15,
                               fontWeight: FontWeight.w600,
                             ),
@@ -230,7 +228,14 @@ class _LoginPageState extends State<LoginPage>
         idToken: googleAuth.idToken,
       );
 
-      await FirebaseAuth.instance.signInWithCredential(credential);
+      final userCredential = await FirebaseAuth.instance.signInWithCredential(credential);
+      final user = userCredential.user!;
+
+      await DatabaseService.ensureGoogleUser(
+        uid: user.uid,
+        displayName: user.displayName ?? googleUser.displayName ?? '',
+        email: user.email ?? '',
+      );
 
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
@@ -251,7 +256,7 @@ class _LoginPageState extends State<LoginPage>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: _black,
+      backgroundColor: AppColors.of(context).background,
       body: Stack(
         children: [
           AnimatedBuilder(
@@ -282,23 +287,23 @@ class _LoginPageState extends State<LoginPage>
               const SizedBox(height: 44),
               const _SectionDivider(),
               const SizedBox(height: 28),
-              const Align(
+              Align(
                 alignment: Alignment.centerLeft,
                 child: Text(
                   'Welcome back',
                   style: TextStyle(
-                    color: _white,
+                    color: AppColors.of(context).onSurface,
                     fontSize: 22,
                     fontWeight: FontWeight.w700,
                   ),
                 ),
               ),
               const SizedBox(height: 4),
-              const Align(
+              Align(
                 alignment: Alignment.centerLeft,
                 child: Text(
                   'Sign in to continue saving.',
-                  style: TextStyle(color: _grey, fontSize: 13),
+                  style: TextStyle(color: AppColors.of(context).subtext, fontSize: 13),
                 ),
               ),
               const SizedBox(height: 24),
@@ -367,7 +372,7 @@ class _LoginPageState extends State<LoginPage>
                     backgroundColor: _walnut,
                     disabledBackgroundColor:
                         _walnut.withValues(alpha: 0.6),
-                    foregroundColor: _white,
+                    foregroundColor: Colors.white,
                     elevation: 0,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(14),
@@ -378,7 +383,7 @@ class _LoginPageState extends State<LoginPage>
                           width: 22,
                           height: 22,
                           child: CircularProgressIndicator(
-                            color: _white,
+                            color: Colors.white,
                             strokeWidth: 2.5,
                           ),
                         )
@@ -395,15 +400,15 @@ class _LoginPageState extends State<LoginPage>
               const SizedBox(height: 20),
               Row(
                 children: [
-                  const Expanded(child: Divider(color: Color(0xFF3A3A3A), thickness: 1)),
-                  const Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 14),
+                  Expanded(child: Divider(color: AppColors.of(context).border, thickness: 1)),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 14),
                     child: Text(
                       'or',
-                      style: TextStyle(color: _grey, fontSize: 12),
+                      style: TextStyle(color: AppColors.of(context).subtext, fontSize: 12),
                     ),
                   ),
-                  const Expanded(child: Divider(color: Color(0xFF3A3A3A), thickness: 1)),
+                  Expanded(child: Divider(color: AppColors.of(context).border, thickness: 1)),
                 ],
               ),
               const SizedBox(height: 20),
@@ -413,12 +418,12 @@ class _LoginPageState extends State<LoginPage>
                 child: ElevatedButton(
                   onPressed: _signInWithGoogle,
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: _charcoal,
-                    foregroundColor: _white,
+                    backgroundColor: AppColors.of(context).surface,
+                    foregroundColor: AppColors.of(context).onSurface,
                     elevation: 0,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(14),
-                      side: const BorderSide(color: Color(0xFF3A3A3A), width: 1),
+                      side: BorderSide(color: AppColors.of(context).border, width: 1),
                     ),
                   ),
                   child: Row(
@@ -459,9 +464,9 @@ class _LoginPageState extends State<LoginPage>
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  const Text(
+                  Text(
                     "Don't have an account?  ",
-                    style: TextStyle(color: _grey, fontSize: 14),
+                    style: TextStyle(color: AppColors.of(context).subtext, fontSize: 14),
                   ),
                   GestureDetector(
                     onTap: () => Navigator.pushReplacement(
@@ -587,21 +592,21 @@ class _Field extends StatelessWidget {
       controller: controller,
       obscureText: obscure,
       keyboardType: keyboardType,
-      style: const TextStyle(color: _white, fontSize: 14),
+      style: TextStyle(color: AppColors.of(context).onSurface, fontSize: 14),
       decoration: InputDecoration(
         labelText: label,
-        labelStyle: const TextStyle(color: _grey, fontSize: 13),
+        labelStyle: TextStyle(color: AppColors.of(context).subtext, fontSize: 13),
         prefixIcon: Icon(icon, color: _walnut, size: 20),
         suffixIcon: suffixIcon,
         filled: true,
-        fillColor: _charcoal,
+        fillColor: AppColors.of(context).surface,
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
           borderSide: BorderSide.none,
         ),
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
-          borderSide: const BorderSide(color: Color(0xFF3A3A3A), width: 1),
+          borderSide: BorderSide(color: AppColors.of(context).border, width: 1),
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
@@ -623,7 +628,7 @@ class _VisibilityToggle extends StatelessWidget {
     return IconButton(
       icon: Icon(
         obscure ? Icons.visibility_off_outlined : Icons.visibility_outlined,
-        color: _grey,
+        color: AppColors.of(context).subtext,
         size: 20,
       ),
       onPressed: onTap,
@@ -638,12 +643,12 @@ class _SectionDivider extends StatelessWidget {
   Widget build(BuildContext context) {
     return Row(
       children: [
-        Expanded(child: Divider(color: _charcoal, thickness: 1)),
+        Expanded(child: Divider(color: AppColors.of(context).surface, thickness: 1)),
         const Padding(
           padding: EdgeInsets.symmetric(horizontal: 12),
           child: Icon(Icons.restaurant, color: _walnut, size: 14),
         ),
-        Expanded(child: Divider(color: _charcoal, thickness: 1)),
+        Expanded(child: Divider(color: AppColors.of(context).surface, thickness: 1)),
       ],
     );
   }

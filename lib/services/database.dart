@@ -37,6 +37,29 @@ class DatabaseService {
     });
   }
 
+  static Future<void> ensureGoogleUser({
+    required String uid,
+    required String displayName,
+    required String email,
+  }) async {
+    final doc = await _db.collection('tbl_users').doc(uid).get();
+    if (!doc.exists) {
+      await createUser(
+        uid: uid,
+        displayName: displayName,
+        email: email,
+        password: '',
+        budget: 0,
+      );
+    }
+  }
+
+  static Future<void> updateUserPassword(String newPassword) async {
+    final uid = FirebaseAuth.instance.currentUser?.uid;
+    if (uid == null) return;
+    await _db.collection('tbl_users').doc(uid).update({'password': newPassword});
+  }
+
   static Future<void> updateUserProfile({
     String? displayName,
     String? email,

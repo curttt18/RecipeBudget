@@ -1,12 +1,12 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import '../services/auth_service.dart';
 import '../services/database.dart';
+import '../theme/app_theme.dart';
 import 'aboutus.dart';
 import 'faq.dart';
 
-const _charcoal = Color(0xFF2C2C2C);
 const _walnut = Color(0xFF8B5A2B);
-const _white = Colors.white;
-const _grey = Color(0xFF9E9E9E);
 
 class SettingsPage extends StatefulWidget {
   const SettingsPage({super.key});
@@ -16,7 +16,6 @@ class SettingsPage extends StatefulWidget {
 }
 
 class _SettingsPageState extends State<SettingsPage> {
-  bool _notificationsOn = true;
   String _displayName = '';
   String _email = '';
   double _budget = 0;
@@ -26,6 +25,17 @@ class _SettingsPageState extends State<SettingsPage> {
   void initState() {
     super.initState();
     _loadUserData();
+    themeModeNotifier.addListener(_onThemeChanged);
+  }
+
+  void _onThemeChanged() {
+    if (mounted) setState(() {});
+  }
+
+  @override
+  void dispose() {
+    themeModeNotifier.removeListener(_onThemeChanged);
+    super.dispose();
   }
 
   Future<void> _loadUserData() async {
@@ -54,9 +64,9 @@ class _SettingsPageState extends State<SettingsPage> {
             padding: EdgeInsets.only(bottom: MediaQuery.of(ctx).viewInsets.bottom),
             child: Container(
               padding: const EdgeInsets.fromLTRB(24, 12, 24, 32),
-              decoration: const BoxDecoration(
-                color: Color(0xFF1E1E1E),
-                borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+              decoration: BoxDecoration(
+                color: AppColors.of(ctx).modal,
+                borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
               ),
               child: Column(
                 mainAxisSize: MainAxisSize.min,
@@ -66,16 +76,16 @@ class _SettingsPageState extends State<SettingsPage> {
                     height: 4,
                     margin: const EdgeInsets.only(bottom: 20),
                     decoration: BoxDecoration(
-                      color: const Color(0xFF3A3A3A),
+                      color: AppColors.of(ctx).border,
                       borderRadius: BorderRadius.circular(2),
                     ),
                   ),
-                  const Align(
+                  Align(
                     alignment: Alignment.centerLeft,
                     child: Text(
                       'Edit Profile',
                       style: TextStyle(
-                        color: _white,
+                        color: AppColors.of(ctx).onSurface,
                         fontSize: 18,
                         fontWeight: FontWeight.w700,
                       ),
@@ -127,14 +137,14 @@ class _SettingsPageState extends State<SettingsPage> {
                               width: 20,
                               height: 20,
                               child: CircularProgressIndicator(
-                                color: _white,
+                                color: Colors.white,
                                 strokeWidth: 2,
                               ),
                             )
                           : const Text(
                               'Save Changes',
                               style: TextStyle(
-                                color: _white,
+                                color: Colors.white,
                                 fontSize: 15,
                                 fontWeight: FontWeight.w600,
                               ),
@@ -150,35 +160,313 @@ class _SettingsPageState extends State<SettingsPage> {
     );
   }
 
-  Widget _buildTextField({
+  Widget _buildPasswordField({
     required TextEditingController controller,
     required String label,
-    required IconData icon,
-    TextInputType? keyboardType,
+    required bool obscure,
+    required VoidCallback onToggle,
   }) {
+    final c = AppColors.of(context);
     return TextField(
       controller: controller,
-      keyboardType: keyboardType,
-      style: const TextStyle(color: _white, fontSize: 14),
+      obscureText: obscure,
+      style: TextStyle(color: c.onSurface, fontSize: 14),
       decoration: InputDecoration(
         labelText: label,
-        labelStyle: const TextStyle(color: _grey, fontSize: 13),
-        prefixIcon: Icon(icon, color: _walnut, size: 20),
+        labelStyle: TextStyle(color: c.subtext, fontSize: 13),
+        prefixIcon: const Icon(Icons.lock_outline_rounded, color: _walnut, size: 20),
+        suffixIcon: IconButton(
+          icon: Icon(
+            obscure ? Icons.visibility_off_outlined : Icons.visibility_outlined,
+            color: c.subtext,
+            size: 20,
+          ),
+          onPressed: onToggle,
+        ),
         filled: true,
-        fillColor: _charcoal,
+        fillColor: c.surface,
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
-          borderSide: const BorderSide(color: Color(0xFF3A3A3A)),
+          borderSide: BorderSide(color: c.border),
         ),
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
-          borderSide: const BorderSide(color: Color(0xFF3A3A3A)),
+          borderSide: BorderSide(color: c.border),
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
           borderSide: const BorderSide(color: _walnut, width: 1.5),
         ),
       ),
+    );
+  }
+
+  Widget _buildTextField({
+    required TextEditingController controller,
+    required String label,
+    required IconData icon,
+    TextInputType? keyboardType,
+  }) {
+    final c = AppColors.of(context);
+    return TextField(
+      controller: controller,
+      keyboardType: keyboardType,
+      style: TextStyle(color: c.onSurface, fontSize: 14),
+      decoration: InputDecoration(
+        labelText: label,
+        labelStyle: TextStyle(color: c.subtext, fontSize: 13),
+        prefixIcon: Icon(icon, color: _walnut, size: 20),
+        filled: true,
+        fillColor: c.surface,
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: BorderSide(color: c.border),
+        ),
+        enabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: BorderSide(color: c.border),
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: const BorderSide(color: _walnut, width: 1.5),
+        ),
+      ),
+    );
+  }
+
+  void _showChangePasswordModal() {
+    final user = FirebaseAuth.instance.currentUser;
+    final hasPasswordProvider =
+        user?.providerData.any((p) => p.providerId == 'password') ?? false;
+
+    if (!hasPasswordProvider) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text(
+              'Password change is not available for Google Sign-In accounts.'),
+        ),
+      );
+      return;
+    }
+
+    final currentPassCtrl = TextEditingController();
+    final newPassCtrl = TextEditingController();
+    final confirmPassCtrl = TextEditingController();
+
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (ctx) {
+        bool step2 = false;
+        bool saving = false;
+        String? errorMsg;
+        bool obscureCurrent = true;
+        bool obscureNew = true;
+        bool obscureConfirm = true;
+
+        return StatefulBuilder(
+          builder: (ctx, setModalState) => Padding(
+            padding:
+                EdgeInsets.only(bottom: MediaQuery.of(ctx).viewInsets.bottom),
+            child: Container(
+              padding: const EdgeInsets.fromLTRB(24, 12, 24, 32),
+              decoration: BoxDecoration(
+                color: AppColors.of(ctx).modal,
+                borderRadius:
+                    const BorderRadius.vertical(top: Radius.circular(24)),
+              ),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Container(
+                    width: 40,
+                    height: 4,
+                    margin: const EdgeInsets.only(bottom: 20),
+                    decoration: BoxDecoration(
+                      color: AppColors.of(ctx).border,
+                      borderRadius: BorderRadius.circular(2),
+                    ),
+                  ),
+                  Align(
+                    alignment: Alignment.centerLeft,
+                    child: Text(
+                      step2 ? 'Set New Password' : 'Verify Identity',
+                      style: TextStyle(
+                        color: AppColors.of(ctx).onSurface,
+                        fontSize: 18,
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 6),
+                  Align(
+                    alignment: Alignment.centerLeft,
+                    child: Text(
+                      step2
+                          ? 'Enter and confirm your new password.'
+                          : 'Enter your current password to continue.',
+                      style: TextStyle(color: AppColors.of(ctx).subtext, fontSize: 13),
+                    ),
+                  ),
+                  const SizedBox(height: 24),
+                  if (!step2)
+                    _buildPasswordField(
+                      controller: currentPassCtrl,
+                      label: 'Current Password',
+                      obscure: obscureCurrent,
+                      onToggle: () =>
+                          setModalState(() => obscureCurrent = !obscureCurrent),
+                    )
+                  else ...[  
+                    _buildPasswordField(
+                      controller: newPassCtrl,
+                      label: 'New Password',
+                      obscure: obscureNew,
+                      onToggle: () =>
+                          setModalState(() => obscureNew = !obscureNew),
+                    ),
+                    const SizedBox(height: 14),
+                    _buildPasswordField(
+                      controller: confirmPassCtrl,
+                      label: 'Confirm New Password',
+                      obscure: obscureConfirm,
+                      onToggle: () =>
+                          setModalState(() => obscureConfirm = !obscureConfirm),
+                    ),
+                  ],
+                  if (errorMsg != null) ...[  
+                    const SizedBox(height: 12),
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 14, vertical: 10),
+                      decoration: BoxDecoration(
+                        color: Colors.red.shade900.withValues(alpha: 0.25),
+                        borderRadius: BorderRadius.circular(10),
+                        border: Border.all(
+                            color:
+                                Colors.red.shade800.withValues(alpha: 0.6)),
+                      ),
+                      child: Row(
+                        children: [
+                          Icon(Icons.error_outline_rounded,
+                              color: Colors.red.shade400, size: 16),
+                          const SizedBox(width: 8),
+                          Expanded(
+                            child: Text(
+                              errorMsg!,
+                              style: TextStyle(
+                                  color: Colors.red.shade300, fontSize: 12.5),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                  const SizedBox(height: 28),
+                  SizedBox(
+                    width: double.infinity,
+                    height: 50,
+                    child: ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: _walnut,
+                        disabledBackgroundColor:
+                            _walnut.withValues(alpha: 0.6),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(14),
+                        ),
+                      ),
+                      onPressed: saving
+                          ? null
+                          : () async {
+                              setModalState(
+                                  () { saving = true; errorMsg = null; });
+
+                              if (!step2) {
+                                if (currentPassCtrl.text.isEmpty) {
+                                  setModalState(() {
+                                    errorMsg =
+                                        'Please enter your current password.';
+                                    saving = false;
+                                  });
+                                  return;
+                                }
+                                final err =
+                                    await AuthService.verifyCurrentPassword(
+                                        currentPassCtrl.text);
+                                if (err != null) {
+                                  setModalState(() {
+                                    errorMsg = err;
+                                    saving = false;
+                                  });
+                                } else {
+                                  setModalState(() {
+                                    step2 = true;
+                                    saving = false;
+                                  });
+                                }
+                              } else {
+                                if (newPassCtrl.text.length < 6) {
+                                  setModalState(() {
+                                    errorMsg =
+                                        'Password must be at least 6 characters.';
+                                    saving = false;
+                                  });
+                                  return;
+                                }
+                                if (newPassCtrl.text !=
+                                    confirmPassCtrl.text) {
+                                  setModalState(() {
+                                    errorMsg = 'Passwords do not match.';
+                                    saving = false;
+                                  });
+                                  return;
+                                }
+                                final err = await AuthService.applyNewPassword(
+                                    newPassCtrl.text);
+                                if (err != null) {
+                                  setModalState(() {
+                                    errorMsg = err;
+                                    saving = false;
+                                  });
+                                } else {
+                                  if (ctx.mounted) Navigator.pop(ctx);
+                                  if (mounted) {
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      const SnackBar(
+                                        content: Text(
+                                            'Password changed successfully.'),
+                                      ),
+                                    );
+                                  }
+                                }
+                              }
+                            },
+                      child: saving
+                          ? const SizedBox(
+                              width: 20,
+                              height: 20,
+                              child: CircularProgressIndicator(
+                                color: Colors.white,
+                                strokeWidth: 2,
+                              ),
+                            )
+                          : Text(
+                              step2 ? 'Change Password' : 'Continue',
+                              style: const TextStyle(
+                                color: Colors.white,
+                                fontSize: 15,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        );
+      },
     );
   }
 
@@ -193,9 +481,9 @@ class _SettingsPageState extends State<SettingsPage> {
         maxChildSize: 0.95,
         expand: false,
         builder: (ctx, scrollController) => Container(
-          decoration: const BoxDecoration(
-            color: Color(0xFF1E1E1E),
-            borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+          decoration: BoxDecoration(
+            color: AppColors.of(ctx).modal,
+            borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
           ),
           child: Column(
             children: [
@@ -208,7 +496,7 @@ class _SettingsPageState extends State<SettingsPage> {
                       height: 4,
                       margin: const EdgeInsets.only(bottom: 20),
                       decoration: BoxDecoration(
-                        color: const Color(0xFF3A3A3A),
+                        color: AppColors.of(ctx).border,
                         borderRadius: BorderRadius.circular(2),
                       ),
                     ),
@@ -224,21 +512,21 @@ class _SettingsPageState extends State<SettingsPage> {
                           child: const Icon(Icons.privacy_tip_outlined, color: _walnut, size: 18),
                         ),
                         const SizedBox(width: 12),
-                        const Expanded(
+                        Expanded(
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
                                 'Privacy Policy',
                                 style: TextStyle(
-                                  color: _white,
+                                  color: AppColors.of(ctx).onSurface,
                                   fontSize: 18,
                                   fontWeight: FontWeight.w700,
                                 ),
                               ),
                               Text(
                                 'Effective Date: May 11, 2026',
-                                style: TextStyle(color: _grey, fontSize: 11),
+                                style: TextStyle(color: AppColors.of(ctx).subtext, fontSize: 11),
                               ),
                             ],
                           ),
@@ -246,7 +534,7 @@ class _SettingsPageState extends State<SettingsPage> {
                       ],
                     ),
                     const SizedBox(height: 16),
-                    const Divider(height: 1, color: Color(0xFF2E2E2E)),
+                    Divider(height: 1, color: AppColors.of(ctx).divider),
                   ],
                 ),
               ),
@@ -348,7 +636,7 @@ class _SettingsPageState extends State<SettingsPage> {
             _SettingsTile(
               icon: Icons.lock_outline_rounded,
               title: 'Change Password',
-              onTap: () {},
+              onTap: _showChangePasswordModal,
             ),
             _SettingsTile(
               icon: Icons.attach_money_rounded,
@@ -360,21 +648,17 @@ class _SettingsPageState extends State<SettingsPage> {
           const SizedBox(height: 20),
           _buildSection('Preferences', [
             _SettingsTile(
-              icon: Icons.notifications_outlined,
-              title: 'Notifications',
-              trailing: Switch(
-                value: _notificationsOn,
-                onChanged: (v) => setState(() => _notificationsOn = v),
-                activeThumbColor: _walnut,
-                inactiveThumbColor: _grey,
-                inactiveTrackColor: const Color(0xFF3A3A3A),
-              ),
-            ),
-            _SettingsTile(
               icon: Icons.palette_outlined,
               title: 'Appearance',
-              subtitle: 'Dark mode',
-              onTap: () {},
+              subtitle: themeModeNotifier.value == ThemeMode.dark ? 'Dark mode' : 'Light mode',
+              trailing: Switch(
+                value: themeModeNotifier.value == ThemeMode.dark,
+                onChanged: (v) => themeModeNotifier.value = v ? ThemeMode.dark : ThemeMode.light,
+                activeThumbColor: _walnut,
+                inactiveThumbColor: _walnut,
+                activeTrackColor: _walnut.withValues(alpha: 0.4),
+                inactiveTrackColor: const Color(0xFFDDDDDD),
+              ),
             ),
             _SettingsTile(
               icon: Icons.language_outlined,
@@ -420,9 +704,9 @@ class _SettingsPageState extends State<SettingsPage> {
       margin: const EdgeInsets.fromLTRB(20, 20, 20, 0),
       padding: const EdgeInsets.all(18),
       decoration: BoxDecoration(
-        color: _charcoal,
+        color: AppColors.of(context).surface,
         borderRadius: BorderRadius.circular(18),
-        border: Border.all(color: const Color(0xFF3A3A3A), width: 1),
+        border: Border.all(color: AppColors.of(context).border, width: 1),
       ),
       child: _loading
           ? const Center(
@@ -445,7 +729,7 @@ class _SettingsPageState extends State<SettingsPage> {
                     child: Text(
                       initial,
                       style: const TextStyle(
-                        color: _white,
+                        color: Colors.white,
                         fontSize: 24,
                         fontWeight: FontWeight.w700,
                       ),
@@ -459,8 +743,8 @@ class _SettingsPageState extends State<SettingsPage> {
                     children: [
                       Text(
                         _displayName.isNotEmpty ? _displayName : 'User',
-                        style: const TextStyle(
-                          color: _white,
+                        style: TextStyle(
+                          color: AppColors.of(context).onSurface,
                           fontSize: 17,
                           fontWeight: FontWeight.w700,
                         ),
@@ -468,7 +752,7 @@ class _SettingsPageState extends State<SettingsPage> {
                       const SizedBox(height: 3),
                       Text(
                         _email,
-                        style: const TextStyle(color: _grey, fontSize: 12),
+                        style: TextStyle(color: AppColors.of(context).subtext, fontSize: 12),
                       ),
                       const SizedBox(height: 3),
                       Text(
@@ -510,9 +794,9 @@ class _SettingsPageState extends State<SettingsPage> {
         Container(
           margin: const EdgeInsets.symmetric(horizontal: 20),
           decoration: BoxDecoration(
-            color: _charcoal,
+            color: AppColors.of(context).surface,
             borderRadius: BorderRadius.circular(16),
-            border: Border.all(color: const Color(0xFF3A3A3A), width: 1),
+            border: Border.all(color: AppColors.of(context).border, width: 1),
           ),
           child: Column(
             children: tiles
@@ -522,9 +806,9 @@ class _SettingsPageState extends State<SettingsPage> {
                       children: [
                         e.value,
                         if (e.key < tiles.length - 1)
-                          const Divider(
+                          Divider(
                               height: 1,
-                              color: Color(0xFF333333),
+                              color: AppColors.of(context).divider,
                               indent: 52),
                       ],
                     ))
@@ -534,14 +818,6 @@ class _SettingsPageState extends State<SettingsPage> {
       ],
     );
   }
-}
-
-// ── Privacy policy data ───────────────────────────────────────────────────────
-
-class _Bullet {
-  const _Bullet(this.term, this.description);
-  final String term;
-  final String description;
 }
 
 class _PolicySection extends StatelessWidget {
@@ -588,8 +864,8 @@ class _PolicySection extends StatelessWidget {
               Expanded(
                 child: Text(
                   title,
-                  style: const TextStyle(
-                    color: _white,
+                  style: TextStyle(
+                    color: AppColors.of(context).onSurface,
                     fontSize: 15,
                     fontWeight: FontWeight.w700,
                   ),
@@ -600,7 +876,7 @@ class _PolicySection extends StatelessWidget {
           const SizedBox(height: 10),
           Text(
             body,
-            style: const TextStyle(color: _grey, fontSize: 13, height: 1.6),
+            style: TextStyle(color: AppColors.of(context).subtext, fontSize: 13, height: 1.6),
           ),
           if (bullets.isNotEmpty) ...[
             const SizedBox(height: 10),
@@ -621,16 +897,16 @@ class _PolicySection extends StatelessWidget {
                           children: [
                             TextSpan(
                               text: '${b.term}: ',
-                              style: const TextStyle(
-                                color: _white,
+                              style: TextStyle(
+                                color: AppColors.of(context).onSurface,
                                 fontSize: 13,
                                 fontWeight: FontWeight.w600,
                               ),
                             ),
                             TextSpan(
                               text: b.description,
-                              style: const TextStyle(
-                                color: _grey,
+                              style: TextStyle(
+                                color: AppColors.of(context).subtext,
                                 fontSize: 13,
                                 height: 1.5,
                               ),
@@ -651,6 +927,12 @@ class _PolicySection extends StatelessWidget {
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
+
+class _Bullet {
+  const _Bullet(this.term, this.description);
+  final String term;
+  final String description;
+}
 
 class _SettingsTile extends StatelessWidget {
   const _SettingsTile({
@@ -676,21 +958,21 @@ class _SettingsTile extends StatelessWidget {
         width: 36,
         height: 36,
         decoration: BoxDecoration(
-          color: const Color(0xFF1A1A1A),
+          color: AppColors.of(context).background,
           borderRadius: BorderRadius.circular(10),
         ),
         child: Icon(icon, color: _walnut, size: 18),
       ),
       title: Text(
         title,
-        style: const TextStyle(color: _white, fontSize: 14, fontWeight: FontWeight.w500),
+        style: TextStyle(color: AppColors.of(context).onSurface, fontSize: 14, fontWeight: FontWeight.w500),
       ),
       subtitle: subtitle != null
-          ? Text(subtitle!, style: const TextStyle(color: _grey, fontSize: 12))
+          ? Text(subtitle!, style: TextStyle(color: AppColors.of(context).subtext, fontSize: 12))
           : null,
       trailing: trailing ??
           (onTap != null
-              ? const Icon(Icons.chevron_right_rounded, color: _grey, size: 20)
+              ? Icon(Icons.chevron_right_rounded, color: AppColors.of(context).subtext, size: 20)
               : null),
     );
   }

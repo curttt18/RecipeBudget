@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
 import '../model/recipe_model.dart';
+import '../theme/app_theme.dart';
 
-const _white = Colors.white;
 const _walnut = Color(0xFF8B5A2B);
-const _grey = Color(0xFF9E9E9E);
 
 class RecipeCard extends StatelessWidget {
   const RecipeCard({
@@ -25,9 +24,9 @@ class RecipeCard extends StatelessWidget {
       onTap: onTap,
       child: Container(
         decoration: BoxDecoration(
-          color: const Color(0xFF242424),
+          color: AppColors.of(context).surfaceVariant,
           borderRadius: BorderRadius.circular(16),
-          border: Border.all(color: const Color(0xFF333333), width: 1),
+          border: Border.all(color: AppColors.of(context).divider, width: 1),
         ),
         clipBehavior: Clip.antiAlias,
         child: Column(
@@ -60,8 +59,8 @@ class RecipeCard extends StatelessWidget {
                               ? Icons.favorite_rounded
                               : Icons.favorite_border_rounded,
                           color: isSaved
-                              ? Color(0xFFE57373)
-                              : _white,
+                              ? const Color(0xFFE57373)
+                              : Colors.white,
                           size: 16,
                         ),
                       ),
@@ -81,8 +80,8 @@ class RecipeCard extends StatelessWidget {
                       recipe.title,
                       maxLines: 2,
                       overflow: TextOverflow.ellipsis,
-                      style: const TextStyle(
-                        color: _white,
+                      style: TextStyle(
+                        color: AppColors.of(context).onSurface,
                         fontSize: 12.5,
                         fontWeight: FontWeight.w600,
                         height: 1.3,
@@ -103,13 +102,13 @@ class RecipeCard extends StatelessWidget {
                         if (recipe.prepMinutes != null)
                           Row(
                             children: [
-                              const Icon(Icons.timer_outlined,
-                                  color: _grey, size: 12),
+                              Icon(Icons.timer_outlined,
+                                  color: AppColors.of(context).subtext, size: 12),
                               const SizedBox(width: 2),
                               Text(
                                 '${recipe.prepMinutes}m',
-                                style: const TextStyle(
-                                    color: _grey, fontSize: 11),
+                                style: TextStyle(
+                                    color: AppColors.of(context).subtext, fontSize: 11),
                               ),
                             ],
                           ),
@@ -201,7 +200,7 @@ class _ImagePlaceholder extends StatelessWidget {
               child: Text(
                 category,
                 style: const TextStyle(
-                  color: _white,
+                  color: Colors.white,
                   fontSize: 9,
                   fontWeight: FontWeight.w600,
                   letterSpacing: 0.3,

@@ -1,0 +1,10 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(Get-ChildItem -Path \"d:\\\\android_apps\\\\final_proj\" -Recurse -Include \"*.dart\" -Exclude \"*build*\",\"*.dart_tool*\",\"*node_modules*\")",
+      "Bash(Select-Object -ExpandProperty FullName)",
+      "Bash(Sort-Object)",
+      "PowerShell(Write-Host \"GRADLE BUILD FILES IN ANDROID:\"; Get-ChildItem -Path \"d:\\\\android_apps\\\\final_proj\\\\android\" -Include \"build.gradle\",\"settings.gradle\" -Recurse | Select-Object -ExpandProperty FullName | Sort-Object | Where-Object { $_ -notmatch \"windows|ephemeral\" })"
+    ]
+  }
+}

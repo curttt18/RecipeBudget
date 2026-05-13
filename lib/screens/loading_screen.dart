@@ -1,5 +1,7 @@
 import 'dart:math' as math;
+
 import 'package:flutter/material.dart';
+
 import '../mainscaffhold.dart';
 import '../theme/app_theme.dart';
 
@@ -34,7 +36,6 @@ class _LoadingScreenState extends State<LoadingScreen>
       vsync: this,
     );
 
-    // Four slashes sweep across in quick succession
     _slash1 = CurvedAnimation(
       parent: _controller,
       curve: const Interval(0.00, 0.18, curve: Curves.easeIn),
@@ -52,7 +53,6 @@ class _LoadingScreenState extends State<LoadingScreen>
       curve: const Interval(0.26, 0.46, curve: Curves.easeIn),
     );
 
-    // Dark overlay lifts after slashes to reveal background
     _overlayOpacity = Tween<double>(begin: 0.92, end: 0.60).animate(
       CurvedAnimation(
         parent: _controller,
@@ -60,7 +60,6 @@ class _LoadingScreenState extends State<LoadingScreen>
       ),
     );
 
-    // Logo pops in with a scale + fade
     _logoOpacity = Tween<double>(begin: 0.0, end: 1.0).animate(
       CurvedAnimation(
         parent: _controller,
@@ -74,7 +73,6 @@ class _LoadingScreenState extends State<LoadingScreen>
       ),
     );
 
-    // Bottom text fades in last
     _textOpacity = Tween<double>(begin: 0.0, end: 1.0).animate(
       CurvedAnimation(
         parent: _controller,
@@ -111,10 +109,8 @@ class _LoadingScreenState extends State<LoadingScreen>
       body: Stack(
         fit: StackFit.expand,
         children: [
-          // Background image
           Image.asset('assets/filler.jpg', fit: BoxFit.cover),
 
-          // Dark overlay that lifts as animation progresses
           AnimatedBuilder(
             animation: _overlayOpacity,
             builder: (_, _) => ColoredBox(
@@ -122,7 +118,6 @@ class _LoadingScreenState extends State<LoadingScreen>
             ),
           ),
 
-          // Slash streaks
           AnimatedBuilder(
             animation: _controller,
             builder: (_, _) => CustomPaint(
@@ -135,7 +130,6 @@ class _LoadingScreenState extends State<LoadingScreen>
             ),
           ),
 
-          // Centered logo + branding
           AnimatedBuilder(
             animation: Listenable.merge([_logoOpacity, _logoScale]),
             builder: (_, _) => Opacity(
@@ -147,7 +141,6 @@ class _LoadingScreenState extends State<LoadingScreen>
             ),
           ),
 
-          // Bottom loading text
           AnimatedBuilder(
             animation: _textOpacity,
             builder: (_, _) => Positioned(
@@ -180,7 +173,6 @@ class _LoadingScreenState extends State<LoadingScreen>
   }
 }
 
-// ── Slash painter ──────────────────────────────────────────────────────────────
 
 class _SlashesPainter extends CustomPainter {
   const _SlashesPainter({
@@ -192,15 +184,10 @@ class _SlashesPainter extends CustomPainter {
 
   final double s1, s2, s3, s4;
 
-  // Slash config: (progress, width, color, tiltDeg)
   static const _slashes = [
-    // wide walnut warm flash
     (0, 110.0, Color(0xBB9C6B3C), 14.0),
-    // narrow bright white streak
     (1, 40.0, Color(0x99FFFFFF), 12.0),
-    // medium dark walnut
     (2, 80.0, Color(0xDD7B4A1E), 16.0),
-    // thin bright accent
     (3, 28.0, Color(0xCCFFDDB0), 10.0),
   ];
 
@@ -250,7 +237,6 @@ class _SlashesPainter extends CustomPainter {
       old.s1 != s1 || old.s2 != s2 || old.s3 != s3 || old.s4 != s4;
 }
 
-// ── Branding block ─────────────────────────────────────────────────────────────
 
 class _BrandingContent extends StatelessWidget {
   const _BrandingContent();
@@ -260,7 +246,6 @@ class _BrandingContent extends StatelessWidget {
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
-        // Logo circle
         Container(
           width: 108,
           height: 108,
@@ -307,7 +292,6 @@ class _BrandingContent extends StatelessWidget {
   }
 }
 
-// ── Pulsing dots ───────────────────────────────────────────────────────────────
 
 class _PulsingDots extends StatefulWidget {
   const _PulsingDots();

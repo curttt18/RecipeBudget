@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
+
 import '../theme/app_theme.dart';
 
 const _walnut = Color(0xFF8B5A2B);
 const _walnutLight = Color(0xFFAD7244);
 
-// ── Data ──────────────────────────────────────────────────────────────────────
 
 class _FaqItem {
   const _FaqItem(this.question, this.answer);
@@ -98,7 +98,6 @@ const _sections = [
   ),
 ];
 
-// ── Page ──────────────────────────────────────────────────────────────────────
 
 class FaqPage extends StatelessWidget {
   const FaqPage({super.key});
@@ -140,7 +139,6 @@ class FaqPage extends StatelessWidget {
   }
 }
 
-// ── Section block ─────────────────────────────────────────────────────────────
 
 class _SectionBlock extends StatelessWidget {
   const _SectionBlock({required this.section});
@@ -208,7 +206,6 @@ class _SectionBlock extends StatelessWidget {
   }
 }
 
-// ── FAQ accordion tile ────────────────────────────────────────────────────────
 
 class _FaqTile extends StatefulWidget {
   const _FaqTile({required this.item});

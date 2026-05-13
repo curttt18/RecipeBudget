@@ -1,13 +1,12 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+
 import '../model/meal_plan_model.dart';
 import '../model/recipe_model.dart';
 
 class DatabaseService {
   static final _db = FirebaseFirestore.instance;
 
-  /// Generates a year-sequential ID like "2026001", "2026002", etc.
-  /// Queries tbl_users for all IDs in the current year and increments the count.
   static Future<String> _generateUserID() async {
     final year = DateTime.now().year;
     final snap = await _db
@@ -83,7 +82,6 @@ class DatabaseService {
     }
   }
 
-  // ── Saved recipes ───────────────────────────────────────────────────────
 
   static Future<String?> getCurrentUserID() async {
     final uid = FirebaseAuth.instance.currentUser?.uid;
@@ -150,7 +148,6 @@ class DatabaseService {
             .toSet());
   }
 
-  // ── Meal plans ──────────────────────────────────────────────────────────
 
   static Future<String> _generateMealID() async {
     final year = DateTime.now().year;
@@ -201,7 +198,6 @@ class DatabaseService {
     await _db.collection('tbl_mealplans').doc(docId).delete();
   }
 
-  // ── Recipes ─────────────────────────────────────────────────────────────
 
   static Stream<List<RecipeModel>> recipesStream() {
     return _db

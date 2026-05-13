@@ -1,6 +1,8 @@
 import 'dart:async';
+
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+
 import '../model/meal_plan_model.dart';
 import '../model/recipe_model.dart';
 import '../services/database.dart';
@@ -16,8 +18,6 @@ String _fmtDate(DateTime d) {
   const weekdays = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
   return '${weekdays[d.weekday - 1]}, ${months[d.month - 1]} ${d.day}, ${d.year}';
 }
-
-// ── Page ──────────────────────────────────────────────────────────────────────
 
 class MealPlanPage extends StatefulWidget {
   const MealPlanPage({super.key});
@@ -39,8 +39,6 @@ class _MealPlanPageState extends State<MealPlanPage> {
   }
 
   Future<void> _init() async {
-    // Try the custom sequential ID first; fall back to Firebase Auth UID
-    // so Google Sign-In users (who have no tbl_users doc) don't get stuck
     String? id = await DatabaseService.getCurrentUserID();
     id ??= FirebaseAuth.instance.currentUser?.uid;
     if (!mounted) return;
@@ -180,8 +178,6 @@ class _MealPlanPageState extends State<MealPlanPage> {
   }
 }
 
-// ── Meal plan card ─────────────────────────────────────────────────────────────
-
 class _MealPlanCard extends StatelessWidget {
   const _MealPlanCard({
     required this.plan,
@@ -209,7 +205,6 @@ class _MealPlanCard extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // ── Header: date badge + delete ────────────────────────────────
           Row(
             children: [
               Container(
@@ -255,7 +250,6 @@ class _MealPlanCard extends StatelessWidget {
           ),
           const SizedBox(height: 12),
 
-          // ── Plan name ───────────────────────────────────────────────────
           Text(
             plan.planName,
             style: TextStyle(
@@ -265,7 +259,6 @@ class _MealPlanCard extends StatelessWidget {
             ),
           ),
 
-          // ── Plan details ────────────────────────────────────────────────
           if (plan.planDetails.isNotEmpty) ...[
             const SizedBox(height: 6),
             Text(
@@ -280,7 +273,6 @@ class _MealPlanCard extends StatelessWidget {
             ),
           ],
 
-          // ── Notes chip ──────────────────────────────────────────────────
           if (plan.notes.isNotEmpty) ...[
             const SizedBox(height: 10),
             Container(
@@ -307,7 +299,6 @@ class _MealPlanCard extends StatelessWidget {
             ),
           ],
 
-          // ── Linked recipes ──────────────────────────────────────────────
           if (linked.isNotEmpty || plan.recipeIds.isNotEmpty) ...[
             const SizedBox(height: 10),
             Divider(height: 1, color: AppColors.of(context).divider),
@@ -373,8 +364,6 @@ class _MealPlanCard extends StatelessWidget {
     );
   }
 }
-
-// ── Create plan bottom sheet ───────────────────────────────────────────────────
 
 class _CreatePlanSheet extends StatefulWidget {
   const _CreatePlanSheet({
@@ -461,7 +450,6 @@ class _CreatePlanSheetState extends State<_CreatePlanSheet> {
         ),
         child: Column(
           children: [
-            // ── Fixed header ─────────────────────────────────────────────
             Padding(
               padding: const EdgeInsets.fromLTRB(24, 12, 24, 0),
               child: Column(
@@ -497,7 +485,6 @@ class _CreatePlanSheetState extends State<_CreatePlanSheet> {
               ),
             ),
 
-            // ── Scrollable form ──────────────────────────────────────────
             Expanded(
               child: ListView(
                 controller: scrollCtrl,
@@ -508,7 +495,6 @@ class _CreatePlanSheetState extends State<_CreatePlanSheet> {
                   MediaQuery.of(ctx).viewInsets.bottom + 32,
                 ),
                 children: [
-                  // Plan Name
                   _Field(
                     controller: _nameCtrl,
                     label: 'Plan Name',
@@ -517,7 +503,6 @@ class _CreatePlanSheetState extends State<_CreatePlanSheet> {
                   ),
                   const SizedBox(height: 16),
 
-                  // Schedule date picker
                   GestureDetector(
                     onTap: _pickDate,
                     child: Container(
@@ -559,7 +544,6 @@ class _CreatePlanSheetState extends State<_CreatePlanSheet> {
                   ),
                   const SizedBox(height: 16),
 
-                  // Plan Details
                   _Field(
                     controller: _detailsCtrl,
                     label: 'Plan Details',
@@ -569,7 +553,6 @@ class _CreatePlanSheetState extends State<_CreatePlanSheet> {
                   ),
                   const SizedBox(height: 16),
 
-                  // Notes
                   _Field(
                     controller: _notesCtrl,
                     label: 'Notes',
@@ -578,7 +561,6 @@ class _CreatePlanSheetState extends State<_CreatePlanSheet> {
                     maxLines: 2,
                   ),
 
-                  // Link Recipes
                   if (widget.availableRecipes.isNotEmpty) ...[
                     const SizedBox(height: 24),
                     Row(
@@ -705,8 +687,6 @@ class _CreatePlanSheetState extends State<_CreatePlanSheet> {
     );
   }
 }
-
-// ── Shared form field ──────────────────────────────────────────────────────────
 
 class _Field extends StatelessWidget {
   const _Field({

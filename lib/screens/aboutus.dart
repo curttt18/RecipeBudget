@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+
 import '../theme/app_theme.dart';
 
 const _walnut = Color(0xFF8B5A2B);
@@ -63,7 +64,6 @@ class AboutUsPage extends StatelessWidget {
     );
   }
 
-  // ── Hero ──────────────────────────────────────────────────────────────────
 
   Widget _buildHero(BuildContext context) {
     return Container(
@@ -134,7 +134,6 @@ class AboutUsPage extends StatelessWidget {
     );
   }
 
-  // ── Section wrapper ───────────────────────────────────────────────────────
 
   Widget _buildSection(BuildContext context, {
     required IconData icon,
@@ -177,7 +176,6 @@ class AboutUsPage extends StatelessWidget {
     );
   }
 
-  // ── Our Story ─────────────────────────────────────────────────────────────
 
   Widget _buildStory(BuildContext context) {
     return Container(
@@ -205,7 +203,6 @@ class AboutUsPage extends StatelessWidget {
     );
   }
 
-  // ── Core Values ───────────────────────────────────────────────────────────
 
   Widget _buildCoreValues() {
     return Column(
@@ -235,7 +232,6 @@ class AboutUsPage extends StatelessWidget {
     );
   }
 
-  // ── Team ─────────────────────────────────────────────────────────────────
 
   Widget _buildTeam() {
     return Column(
@@ -280,7 +276,6 @@ class AboutUsPage extends StatelessWidget {
     );
   }
 
-  // ── Footer ────────────────────────────────────────────────────────────────
 
   Widget _buildFooter(BuildContext context) {
     return Padding(
@@ -320,7 +315,6 @@ class AboutUsPage extends StatelessWidget {
   }
 }
 
-// ── Value Card ────────────────────────────────────────────────────────────────
 
 class _ValueCard extends StatelessWidget {
   const _ValueCard({
@@ -387,7 +381,6 @@ class _ValueCard extends StatelessWidget {
   }
 }
 
-// ── Team Card ─────────────────────────────────────────────────────────────────
 
 class _TeamCard extends StatelessWidget {
   const _TeamCard({

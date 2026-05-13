@@ -1071,7 +1071,6 @@ class _PolicySection extends StatelessWidget {
   }
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
 
 class _Bullet {
   const _Bullet(this.term, this.description);

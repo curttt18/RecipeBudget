@@ -1,11 +1,12 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+
 import '../services/auth_service.dart';
 import '../services/database.dart';
 import '../theme/app_theme.dart';
-import 'register.dart';
 import 'loading_screen.dart';
+import 'register.dart';
 
 const _walnut = Color(0xFF8B5A2B);
 
@@ -494,7 +495,6 @@ class _LoginPageState extends State<LoginPage>
   }
 }
 
-// ── Slash background painter ──────────────────────────────────────────────────
 
 class _SlashPainter extends CustomPainter {
   _SlashPainter(this.progress);

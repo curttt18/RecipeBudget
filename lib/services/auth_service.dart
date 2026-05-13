@@ -1,10 +1,10 @@
 import 'package:firebase_auth/firebase_auth.dart';
+
 import 'database.dart';
 
 class AuthService {
   static final _auth = FirebaseAuth.instance;
 
-  /// Returns null on success, or an error message string on failure.
   static Future<String?> register({
     required String name,
     required String email,

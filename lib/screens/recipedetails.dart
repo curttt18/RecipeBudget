@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+
 import '../model/recipe_model.dart';
 import '../services/database.dart';
 import '../theme/app_theme.dart';
@@ -82,7 +83,6 @@ class _RecipeDetailsPageState extends State<RecipeDetailsPage> {
     }
   }
 
-  // Split a single instructions string ("Step 1 - ...\nStep 2 - ...") into steps.
   List<String> _parseSteps(List<String> raw) {
     if (raw.length == 1 && raw[0].contains(RegExp(r'Step \d+'))) {
       return raw[0]
@@ -137,8 +137,6 @@ class _RecipeDetailsPageState extends State<RecipeDetailsPage> {
     );
   }
 
-  // ── Sliver app bar with hero image ────────────────────────────────────────
-
   SliverAppBar _buildAppBar(RecipeModel recipe) {
     return SliverAppBar(
       expandedHeight: 290,
@@ -170,7 +168,6 @@ class _RecipeDetailsPageState extends State<RecipeDetailsPage> {
                     errorBuilder: (ctx, err, stack) => _imagePlaceholder(),
                   )
                 : _imagePlaceholder(),
-            // Bottom gradient so title stays readable
             Container(
               decoration: const BoxDecoration(
                 gradient: LinearGradient(
@@ -181,7 +178,6 @@ class _RecipeDetailsPageState extends State<RecipeDetailsPage> {
                 ),
               ),
             ),
-            // Category badge — top-right
             Positioned(
               top: 56,
               right: 16,
@@ -229,8 +225,6 @@ class _RecipeDetailsPageState extends State<RecipeDetailsPage> {
     );
   }
 
-  // ── Title + cost ───────────────────────────────────────────────────────────
-
   Widget _buildTitleRow(RecipeModel recipe) {
     return Text(
       recipe.title,
@@ -243,8 +237,6 @@ class _RecipeDetailsPageState extends State<RecipeDetailsPage> {
       ),
     );
   }
-
-  // ── Stat chips ─────────────────────────────────────────────────────────────
 
   Widget _buildStatsRow(RecipeModel recipe) {
     final c = AppColors.of(context);
@@ -271,8 +263,6 @@ class _RecipeDetailsPageState extends State<RecipeDetailsPage> {
     );
   }
 
-  // ── Section header ─────────────────────────────────────────────────────────
-
   Widget _buildSectionHeader(String title, IconData icon) {
     return Row(
       children: [
@@ -298,8 +288,6 @@ class _RecipeDetailsPageState extends State<RecipeDetailsPage> {
       ],
     );
   }
-
-  // ── Ingredients ────────────────────────────────────────────────────────────
 
   Widget _buildIngredientsList(List<String> ingredients) {
     return Container(
@@ -352,8 +340,6 @@ class _RecipeDetailsPageState extends State<RecipeDetailsPage> {
     );
   }
 
-  // ── Instructions ───────────────────────────────────────────────────────────
-
   Widget _buildStepsList(List<String> steps) {
     return Column(
       children: steps.asMap().entries.map((e) {
@@ -403,8 +389,6 @@ class _RecipeDetailsPageState extends State<RecipeDetailsPage> {
       }).toList(),
     );
   }
-
-  // ── Save FAB ───────────────────────────────────────────────────────────────
 
   Widget _buildSaveButton(BuildContext context) {
     final saved = _isSaved;
@@ -468,8 +452,6 @@ class _RecipeDetailsPageState extends State<RecipeDetailsPage> {
     );
   }
 }
-
-// ── Stat chip widget ──────────────────────────────────────────────────────────
 
 class _StatChip extends StatelessWidget {
   const _StatChip({

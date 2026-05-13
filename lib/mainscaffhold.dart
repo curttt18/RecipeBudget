@@ -1,13 +1,15 @@
 import 'dart:async';
+
 import 'package:flutter/material.dart';
+
 import 'model/recipe_model.dart';
 import 'screens/home.dart';
 import 'screens/login.dart';
+import 'screens/meal_plan.dart';
 import 'screens/profile.dart';
 import 'screens/recipedetails.dart';
 import 'screens/recipelist.dart';
 import 'screens/register.dart';
-import 'screens/meal_plan.dart';
 import 'screens/settings.dart';
 import 'services/database.dart';
 import 'theme/app_theme.dart';
@@ -31,7 +33,6 @@ class SavrApp extends StatelessWidget {
   }
 }
 
-// ── Main scaffold ──────────────────────────────────────────────────────────────
 
 class MainScaffold extends StatefulWidget {
   const MainScaffold({super.key});
@@ -86,7 +87,6 @@ class _MainScaffoldState extends State<MainScaffold> {
           Navigator.pop(context);
         },
       ),
-      // IndexedStack preserves each page's scroll and state across tab switches
       body: IndexedStack(
         index: _currentIndex,
         children: [
@@ -134,7 +134,6 @@ class _MainScaffoldState extends State<MainScaffold> {
   }
 }
 
-// ── Wooden drawer ──────────────────────────────────────────────────────────────
 
 class _SavrDrawer extends StatelessWidget {
   const _SavrDrawer({required this.currentIndex, required this.onNavigate});
@@ -311,7 +310,6 @@ class _SavrDrawer extends StatelessWidget {
   }
 }
 
-// ── Drawer components ──────────────────────────────────────────────────────────
 
 class _NavItem extends StatelessWidget {
   const _NavItem({
@@ -388,7 +386,6 @@ class _WoodDivider extends StatelessWidget {
   }
 }
 
-// ── Browse recipes page ────────────────────────────────────────────────────────
 
 class _RecipeBrowserPage extends StatefulWidget {
   const _RecipeBrowserPage();
@@ -588,7 +585,6 @@ class _RecipeBrowserPageState extends State<_RecipeBrowserPage> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // ── Search + filter button ──────────────────────────────────
               Padding(
                 padding: const EdgeInsets.fromLTRB(20, 20, 20, 0),
                 child: Row(
@@ -672,7 +668,6 @@ class _RecipeBrowserPageState extends State<_RecipeBrowserPage> {
                 ),
               ),
 
-              // ── Active filter chip ──────────────────────────────────────
               if (_selectedCategory != null)
                 Padding(
                   padding: const EdgeInsets.fromLTRB(20, 12, 20, 0),
@@ -715,7 +710,6 @@ class _RecipeBrowserPageState extends State<_RecipeBrowserPage> {
                   ),
                 ),
 
-              // ── Header row ─────────────────────────────────────────────
               Padding(
                 padding: const EdgeInsets.fromLTRB(20, 20, 20, 12),
                 child: Row(
@@ -749,7 +743,6 @@ class _RecipeBrowserPageState extends State<_RecipeBrowserPage> {
                 ),
               ),
 
-              // ── Content ────────────────────────────────────────────────
               if (snapshot.hasError)
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 20),
@@ -811,7 +804,6 @@ class _RecipeBrowserPageState extends State<_RecipeBrowserPage> {
   }
 }
 
-// ── Settings shell ─────────────────────────────────────────────────────────────
 
 class _SettingsShell extends StatelessWidget {
   const _SettingsShell();

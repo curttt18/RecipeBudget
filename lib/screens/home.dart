@@ -1,5 +1,7 @@
 import 'dart:async';
+
 import 'package:flutter/material.dart';
+
 import '../model/recipe_model.dart';
 import '../services/database.dart';
 import '../theme/app_theme.dart';
@@ -145,7 +147,6 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  // ── Welcome header ─────────────────────────────────────────────────────────
 
   Widget _buildWelcome() {
     final displayName = _userName.isEmpty ? 'there' : _userName;
@@ -207,7 +208,6 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  // ── Budget card ────────────────────────────────────────────────────────────
 
   Widget _buildBudgetCard() {
     return Container(
@@ -276,7 +276,6 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  // ── Category chips ─────────────────────────────────────────────────────────
 
   Widget _buildCategoryChips() {
     return Padding(
@@ -323,7 +322,6 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  // ── Feed header ────────────────────────────────────────────────────────────
 
   Widget _buildFeedHeader(int count, bool loading) {
     return Padding(
@@ -361,7 +359,6 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  // ── Empty state ────────────────────────────────────────────────────────────
 
   Widget _buildEmptyState() {
     return Padding(

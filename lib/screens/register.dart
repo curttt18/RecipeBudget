@@ -321,34 +321,21 @@ class _RegisterPageState extends State<RegisterPage>
   }
 }
 
-// ── Slash background painter ──────────────────────────────────────────────────
 
 class _SlashPainter extends CustomPainter {
   _SlashPainter(this.progress);
   final double progress;
 
-  // Each entry: [phase, duration, x1r, y1r, x2r, y2r, strokeWidth]
-  // 10 individual slashes — all angles, varied thickness, some overlap.
   static const _defs = [
-    // 1. Horizontal, thin — upper band. Overlaps with #2.
     [0.00, 0.17, -0.10, 0.18,  1.10, 0.18, 0.9],
-    // 2. ~38° right diagonal, thick — left edge to center. Overlaps with #1.
     [0.10, 0.18, -0.10, 0.05,  0.80, 0.75, 3.2],
-    // 3. Vertical, medium — left-center column. Overlaps with #4.
     [0.28, 0.17,  0.22, -0.05, 0.22, 1.05, 1.5],
-    // 4. ~35° left diagonal, thin — upper-right to lower-left. Overlaps with #3.
     [0.35, 0.17,  1.10, 0.10,  0.15, 0.75, 1.0],
-    // 5. Nearly horizontal, thick — lower band, slight tilt. Overlaps with #6.
     [0.50, 0.17, -0.10, 0.65,  1.10, 0.70, 2.5],
-    // 6. ~33° left diagonal, medium — top-right to mid-left. Overlaps with #5.
     [0.55, 0.17,  1.10, 0.08,  0.30, 0.60, 1.6],
-    // 7. Near-vertical (~83°), thin — right side. Overlaps with #8.
     [0.65, 0.17,  0.75, -0.05, 0.82, 1.05, 0.8],
-    // 8. Vertical, thick — center-right column. Overlaps with #7.
     [0.72, 0.17,  0.60, -0.05, 0.60, 1.05, 3.0],
-    // 9. ~12° shallow right diagonal, medium — sweeps low. Overlaps with #10.
     [0.83, 0.17, -0.10, 0.82,  1.10, 0.55, 1.4],
-    // 10. ~80° steep right diagonal, thin — far-right edge. Overlaps with #9.
     [0.90, 0.17,  0.88, -0.05, 1.05, 0.90, 1.1],
   ];
 
@@ -381,7 +368,6 @@ class _SlashPainter extends CustomPainter {
       final ex = x1 + (x2 - x1) * drawP;
       final ey = y1 + (y2 - y1) * drawP;
 
-      // Soft glow behind the slash
       canvas.drawLine(
         Offset(x1, y1),
         Offset(ex, ey),
@@ -393,7 +379,6 @@ class _SlashPainter extends CustomPainter {
           ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 5),
       );
 
-      // Sharp slash line
       canvas.drawLine(
         Offset(x1, y1),
         Offset(ex, ey),
@@ -410,7 +395,6 @@ class _SlashPainter extends CustomPainter {
   bool shouldRepaint(_SlashPainter old) => old.progress != progress;
 }
 
-// ── Logo ──────────────────────────────────────────────────────────────────────
 
 class _LogoImage extends StatelessWidget {
   const _LogoImage();
@@ -441,7 +425,6 @@ class _LogoImage extends StatelessWidget {
   }
 }
 
-// ── Shared widgets ────────────────────────────────────────────────────────────
 
 class _Field extends StatelessWidget {
   const _Field({

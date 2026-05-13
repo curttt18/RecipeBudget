@@ -245,32 +245,46 @@ class _HomePageState extends State<HomePage> {
             ],
           ),
           const SizedBox(height: 6),
-          Row(
-            children: [
-              Text('₱1',
-                  style: TextStyle(color: AppColors.of(context).subtext, fontSize: 11)),
-              Expanded(
-                child: BudgetSlider(
-                  value: _budget,
-                  min: 1,
-                  max: _budget > 500 ? _budget : 500,
-                  onChanged: (v) => setState(() => _budget = v),
+          if (_budget > 0) ...[
+            Row(
+              children: [
+                Text('₱1',
+                    style: TextStyle(color: AppColors.of(context).subtext, fontSize: 11)),
+                Expanded(
+                  child: BudgetSlider(
+                    value: _budget,
+                    min: 1,
+                    max: _budget > 500 ? _budget : 500,
+                    onChanged: (v) => setState(() => _budget = v),
+                  ),
+                ),
+                Text('₱${(_budget > 500 ? _budget : 500).toStringAsFixed(0)}',
+                    style: TextStyle(color: AppColors.of(context).subtext, fontSize: 11)),
+              ],
+            ),
+            Center(
+              child: Text(
+                'Showing meals under ₱${_budget.toStringAsFixed(0)}',
+                style: TextStyle(
+                  color: AppColors.of(context).subtext,
+                  fontSize: 12,
+                  fontStyle: FontStyle.italic,
                 ),
               ),
-              Text('₱${(_budget > 500 ? _budget : 500).toStringAsFixed(0)}',
-                  style: TextStyle(color: AppColors.of(context).subtext, fontSize: 11)),
-            ],
-          ),
-          Center(
-            child: Text(
-              'Showing meals under ₱${_budget.toStringAsFixed(0)}',
-              style: TextStyle(
-                color: AppColors.of(context).subtext,
-                fontSize: 12,
-                fontStyle: FontStyle.italic,
+            ),
+          ] else
+            Padding(
+              padding: const EdgeInsets.symmetric(vertical: 8),
+              child: Text(
+                'Set your budget in profile settings\nunder budget settings button',
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  color: const Color(0xFF8B5A2B),
+                  fontSize: 12,
+                  fontStyle: FontStyle.italic,
+                ),
               ),
             ),
-          ),
         ],
       ),
     );

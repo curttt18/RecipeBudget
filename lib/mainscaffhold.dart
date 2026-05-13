@@ -135,11 +135,38 @@ class _MainScaffoldState extends State<MainScaffold> {
 }
 
 
-class _SavrDrawer extends StatelessWidget {
+class _SavrDrawer extends StatefulWidget {
   const _SavrDrawer({required this.currentIndex, required this.onNavigate});
 
   final int currentIndex;
   final ValueChanged<int> onNavigate;
+
+  @override
+  State<_SavrDrawer> createState() => _SavrDrawerState();
+}
+
+class _SavrDrawerState extends State<_SavrDrawer> {
+  StreamSubscription<Map<String, dynamic>?>? _userSub;
+  String _displayName = '';
+  double _budget = 0;
+
+  @override
+  void initState() {
+    super.initState();
+    _userSub = DatabaseService.userDataStream().listen((data) {
+      if (!mounted || data == null) return;
+      setState(() {
+        _displayName = (data['displayName'] ?? '').toString();
+        _budget = (data['budget'] as num?)?.toDouble() ?? 0;
+      });
+    });
+  }
+
+  @override
+  void dispose() {
+    _userSub?.cancel();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -154,26 +181,26 @@ class _SavrDrawer extends StatelessWidget {
           _NavItem(
             icon: Icons.home_rounded,
             label: 'Home',
-            selected: currentIndex == 0,
-            onTap: () => onNavigate(0),
+            selected: widget.currentIndex == 0,
+            onTap: () => widget.onNavigate(0),
           ),
           _NavItem(
             icon: Icons.restaurant_menu_rounded,
             label: 'Browse Recipes',
-            selected: currentIndex == 1,
-            onTap: () => onNavigate(1),
+            selected: widget.currentIndex == 1,
+            onTap: () => widget.onNavigate(1),
           ),
           _NavItem(
             icon: Icons.bookmark_rounded,
             label: 'My Recipes',
-            selected: currentIndex == 2,
-            onTap: () => onNavigate(2),
+            selected: widget.currentIndex == 2,
+            onTap: () => widget.onNavigate(2),
           ),
           _NavItem(
             icon: Icons.calendar_month_rounded,
             label: 'Meal Plan',
-            selected: currentIndex == 3,
-            onTap: () => onNavigate(3),
+            selected: widget.currentIndex == 3,
+            onTap: () => widget.onNavigate(3),
           ),
           const Spacer(),
           const _WoodDivider(),
@@ -262,10 +289,10 @@ class _SavrDrawer extends StatelessWidget {
               color: const Color(0xFF8B5A2B),
               border: Border.all(color: const Color(0xFFAD7244), width: 1.5),
             ),
-            child: const Center(
+            child: Center(
               child: Text(
-                'J',
-                style: TextStyle(
+                _displayName.isNotEmpty ? _displayName[0].toUpperCase() : '?',
+                style: const TextStyle(
                   color: Colors.white,
                   fontSize: 20,
                   fontWeight: FontWeight.w700,
@@ -279,7 +306,7 @@ class _SavrDrawer extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'Jacob',
+                  _displayName.isNotEmpty ? _displayName : '—',
                   style: TextStyle(
                     color: c.drawerText,
                     fontSize: 15,
@@ -288,9 +315,11 @@ class _SavrDrawer extends StatelessWidget {
                 ),
                 const SizedBox(height: 3),
                 Text(
-                  'Budget: ₱20.00 / meal',
+                  _budget > 0
+                      ? 'Budget: ₱${_budget.toStringAsFixed(2)} / meal'
+                      : 'Set your budget in profile settings\nunder budget settings button',
                   style: TextStyle(
-                    color: c.drawerNavNormal,
+                    color: _budget > 0 ? c.drawerNavNormal : const Color(0xFF8B5A2B),
                     fontSize: 11.5,
                   ),
                 ),
